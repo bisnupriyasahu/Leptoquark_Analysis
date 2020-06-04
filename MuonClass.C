@@ -78,20 +78,20 @@ void MuonClass::Loop(Long64_t maxEvents, int reportEvery)
   sw.Start();
   for (Long64_t jentry=0; jentry<nentries;jentry++)
     {
-      auto Squark= false;
+      //      auto Squark= false;
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      if (ientry % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", ientry, nentries);
-      fflush(stdout);
-      for  (auto k=0 ; k < mcPID->size(); k++){
+      //if (ientry % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", ientry, nentries);
+      //fflush(stdout);
+      /* for  (auto k=0 ; k < mcPID->size(); k++){
 	if (fabs(mcPID->at(k))==3  && mcStatus->at(k)==23  && fabs(mcMomPID->at(k))== 9000009 ) {numOf_s_quark++; Squark= true;}     
 	if (fabs(mcPID->at(k))==4  && mcStatus->at(k)==23  && fabs(mcMomPID->at(k))== 9000008 ) numOf_c_quark++;
 
 
 
       } //for k
-
+      */
       	std::cout<<"coming here 1b"<<std::endl; 
 	//if (Squark) continue;
 
