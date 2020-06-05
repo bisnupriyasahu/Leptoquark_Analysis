@@ -161,7 +161,7 @@ void MuonClass::Loop(Long64_t maxEvents, int reportEvery)
 	     
 	     for (int ijet= 0 ; ijet < nJet ; ijet++){
 	       // if (jetPFLooseId->at(ijet) > 0.5 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)
-	       if (jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)
+	       if ((*jetID)[ijet]>>0&1 == 1 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)
 		 recoHT += jetPt->at(ijet);
 	       std::cout<<"recoHT   = "<<recoHT<<std::endl;
 	     }
@@ -178,7 +178,7 @@ void MuonClass::Loop(Long64_t maxEvents, int reportEvery)
 	       std::cout<<"her it comes jet4mom"<<std::endl;
 	       //	  bool goodJet = ( jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5);
 	       // bool goodJet = (jetPFLooseId->at(ijet) > 0.5 && jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)
-	       bool goodJet = (jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5);
+	       bool goodJet = ((*jetID)[ijet]>>0&1 == 1 && jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5);
 	       if (! goodJet) continue;
 	       LQ4Momentum=Jet4Momentum + Mu4Momentum;
 	       std::cout<<"her it comes LQ"<<std::endl;

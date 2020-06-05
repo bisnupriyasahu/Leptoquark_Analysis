@@ -47,8 +47,8 @@ class MuonClass {
   int getNumBJets(float BJetPtCut,float CSVCut);
   int getNumZBoson();
   float TMass_F(float pt3lep, float px3lep, float py3lep, float met, float metPhi);
-  auto numOf_c_quark=0;
-  auto numOf_s_quark=0;
+  //  auto numOf_c_quark=0;
+  //auto numOf_s_quark=0;
 
 
 
@@ -380,7 +380,7 @@ int MuonClass::getNumJets(float SimpleJetPtCut){
     std::cout<<"iJet   "<<ijet<<std::endl;   
     // if (jetPFLooseId->at(ijet) > 0.5 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 )
     // if (jetPFLooseId->at(ijet) > 0.5 )
-    if (jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
+    if ((*jetID)[ijet]>>0&1 == 1 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
       numJet++;
     std::cout<<"numJet   "<<numJet<<std::endl;
     // std::cout<<"jetPFLooseId->at(ijet)   "<<jetPFLooseId->at(ijet)<<std::endl;
