@@ -214,6 +214,17 @@ void MuonClass::Loop(Long64_t maxEvents, int reportEvery)
                     
 	       bool MT_category[size_mTCat] = {NoMT,HighMT,MT50To150,MTMore300,MTMore500};
 	       std::string MT_Cat[size_mTCat] = {"_NoMT","_HighMT","_MT50To150","_MT300","_MT500"};
+	       
+	       //###############################################################################################
+	       //  dPhi Jet_MET Categorization
+	       //###############################################################################################
+                    
+	       const int size_jetMetPhi = 1;
+	       bool HighDPhi = (deltaPhi(Jet4Momentum.Phi(),pfMETPhi) >= 0.5 && deltaPhi(Mu4Momentum.Phi(),pfMETPhi) >= 0.5  );
+	       bool jetMetPhi_category[size_jetMetPhi] = {HighDPhi};
+	       std::string jetMetPhi_Cat[size_jetMetPhi] = {"_HighDPhi"};
+                    
+
 	       }//for jet loop in jet4momentum
 	     
       }//for loop imu
