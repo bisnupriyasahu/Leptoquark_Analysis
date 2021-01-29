@@ -50,6 +50,11 @@ public :
   std::vector<float>  GeneratorInfo();                                                                                                                                                                
   float compTopPtWeight(float topPt);
   float compTopPtWeight(float top1Pt, float top2Pt);
+  /*  std::vector<string> input;
+
+  map<string, TH1F*>* myMap1;
+  map<string, TH2F*>* myMap2;
+  */
   int getNumJets(float SimpleJetPtCut);
   int getNumBJets(float BJetPtCut,float CSVCut);
   int getNumZBoson();
@@ -749,6 +754,10 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
 {
   TChain *chain = new TChain("phoJetNtuplizer/eventTree");
   TString path = file1;
+  std::vector<string> input;
+
+  //  map<string, TH1F*>* myMap1;
+  //map<string, TH2F*>* myMap2;
 
 
   TSystemDirectory sourceDir("hi",path);
@@ -770,7 +779,7 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
 	  //   std::cout<<"comin 2"<<std::endl;                                                                                                                                                           
 	  if(name.Contains(dataset))
 	    {
-	      std::cout<<"FullPathInputFile:"<<FullPathInputFile<<std::endl;
+	      //  std::cout<<"FullPathInputFile:"<<FullPathInputFile<<std::endl;
 	      chain->Add(FullPathInputFile);
 	    }//name dataset                                                                                                                                                                              
 	}//file no                                                                                                                                                                                       
@@ -779,7 +788,7 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
   //  std::cout<<"comin 3"<<std::endl;                                                                                                                                                               
 
 
-  std::cout<<"All files added."<<std::endl;
+  //std::cout<<"All files added."<<std::endl;
   std::cout<<"Initializing chain."<<std::endl;
   Init(chain);
   Histograms(file2);

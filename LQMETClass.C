@@ -12,10 +12,10 @@
 
 #include <string>
 #include <ostream>
-
+#include <map>
 
 using namespace std;
-
+std::vector<string> input;
 int main(int argc, const char* argv[])
 {
 
@@ -33,6 +33,21 @@ int main(int argc, const char* argv[])
       std::cout<<"Please enter a valid value for reportEvery (parameter 4)."<<std::endl;
       return 1;
     }
+
+  
+
+  map<string, TH1F*>* myMap1;
+  map<string, TH2F*>* myMap2;
+
+
+  myMap1 = new std::map<std::string, TH1F*>();
+  myMap2 = new map<string, TH2F*>();
+  std::cout<<"hello to input to addinputroot"<<std::endl;
+  for (int f = 2; f < argc; f++) {
+    input.push_back(*(argv + f));
+    cout <<"INPUT NAME IS:   " << input[f - 2] << "\n";
+  }
+
   LQMETClass t(argv[1],argv[2]);
   t.Loop(maxEvents,reportEvery);
   return 0;
@@ -46,6 +61,7 @@ void LQMETClass::Loop(Long64_t maxEvents, int reportEvery)
   int nTotal;
   nTotal = 0;
   TLorentzVector Mu4Momentum, Jet4Momentum,LQ4Momentum,Mu24Momentum;
+
   Mu4Momentum.Clear();
   Jet4Momentum.Clear();
   LQ4Momentum.Clear();
@@ -62,8 +78,15 @@ void LQMETClass::Loop(Long64_t maxEvents, int reportEvery)
   std::cout<<"Running over "<<nTotal<<" events."<<std::endl;
   TStopwatch sw;
   sw.Start();
+
+
   for (Long64_t jentry=0; jentry<nentries;jentry++)
-    {//      auto Squark= false;                                                                                                                                                                          
+    {//      auto Squark= false;                                         
+
+      TFile *f_Double = TFile::Open(input[jentry].c_str());
+      cout << "\n  Now is running on ------->   " << std::string(f_Double->GetName()) << "\n";
+      std::string InputROOT= std::string(f_Double->GetName());
+                                                                                                                                 
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -105,8 +128,13 @@ void LQMETClass::Loop(Long64_t maxEvents, int reportEvery)
       //###############################################################################################                                                                                                   
       //  GenInfo                                                                                                                                                                                         
       //###############################################################################################                                                                                                   
-      vector<float>  genInfo=GeneratorInfo();                                                                                                                                                         
+      vector<float>  genInfo=GeneratorInfo();                    
 
+                                                                                                                                     
+      //            //######################## Top Pt Reweighting
+      float TopPtReweighting = 1;
+      // size_t isTTJets = InputROOT.find("TTJets");
+      //if (isTTJets!= string::npos) TopPtReweighting = genInfo[0];
 
 
 
