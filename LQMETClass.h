@@ -26,6 +26,8 @@
 #include "TNtuple.h"
 #include <stdio.h>
 #include <utility>
+#include "TGraphAsymmErrors.h"
+#include "plotfill_histo.h"
 using namespace std;
 
 class LQMETClass {
@@ -47,6 +49,12 @@ public :
   TH1F *Jet_JetPhi;
   TH1I *mu_Mu4Momentum;
   TH1F *Muon_IsoMu;
+  TH2F**  FuncHistMuId();
+  TH2F**  FuncHistMuIso();
+  TH1F**  FuncHistMuTrigger();
+  TGraphAsymmErrors * FuncHistMuTrack();
+
+
   std::vector<float>  GeneratorInfo();                                                                                                                                                                
   float compTopPtWeight(float topPt);
   float compTopPtWeight(float top1Pt, float top2Pt);
@@ -55,11 +63,27 @@ public :
   map<string, TH1F*>* myMap1;
   map<string, TH2F*>* myMap2;
   */
+  int getNumTau();
   int getNumJets(float SimpleJetPtCut);
   int getNumBJets(float BJetPtCut,float CSVCut);
   int getNumZBoson();
   float TMass_F(float pt3lep, float px3lep, float py3lep, float met, float metPhi);
   float deltaPhi(float a, float b);
+
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  int etaPOINT=-1;
+
+
+  float getCorrFactorMuon94X(bool isData, float pt, float eta, TH2F ** HistoId, TH2F ** HistoIso,TH1F ** HistoTrg, TGraphAsymmErrors * graph);
+  float Cor94X_ID_Mu(float pt,float eta, TH2F* HistoId);
+  float Cor94X_Iso_Mu(float pt, float eta , TH2F * HistoIso);
+  float Cor94X_Trigger_Mu_onlyEta(float eta, TH1F* HistoTrg );
+  float Cor94X_TRK_Mu_Full2016(float eta, TGraphAsymmErrors * graph );
+
+
+
   //  auto numOf_c_quark=0;                                                                                                                                                                               
   //auto numOf_s_quark=0;                                                                                                                                                                                 
 
@@ -755,7 +779,7 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
   TChain *chain = new TChain("phoJetNtuplizer/eventTree");
   TString path = file1;
   std::vector<string> input;
-
+  //input.push_back(*(file1));
   //  map<string, TH1F*>* myMap1;
   //map<string, TH2F*>* myMap2;
 
@@ -766,6 +790,7 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
   TSystemFile* filename;
   int fileNumber = 0;
   int maxFiles = -1;
+ 
   std::cout<<"path:"<<path<<std::endl;
   //std::cout<<"COMMING IN BEFORE PATH"<<std::endl;                                                                                                                                                        
   while ((filename = (TSystemFile*)next()) && fileNumber >  maxFiles)
@@ -773,14 +798,23 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
       // std::cout<<"comin 1"<<std::endl;                                                                                                                                                                 
       if(fileNumber > 1)
 	{
-	  TString dataset = "";
+	  TString dataset = "_DYJetsToLL_";
 	  TString  FullPathInputFile = (path+filename->GetName());
+	  
 	  TString name = filename->GetName();
 	  //   std::cout<<"comin 2"<<std::endl;                                                                                                                                                           
-	  if(name.Contains(dataset))
+	    if(name.Contains(dataset))
 	    {
-	      //  std::cout<<"FullPathInputFile:"<<FullPathInputFile<<std::endl;
-	      chain->Add(FullPathInputFile);
+	      //	   
+	    TFile *f_Double = TFile::Open(FullPathInputFile);
+	    std::string InputROOT= std::string(f_Double->GetName());
+	    TFile * myFile = TFile::Open(f_Double->GetName());
+	    TH1F * HistoTot = (TH1F*) myFile->Get("hcount");
+
+	    std::cout<<"InputROOT:"<<InputROOT<<std::endl;
+	    //	      std::cout<<"FullPathInputFile:"<<FullPathInputFile<<std::endl;
+
+	    chain->Add(FullPathInputFile);
 	    }//name dataset                                                                                                                                                                              
 	}//file no                                                                                                                                                                                       
       fileNumber++;
@@ -788,11 +822,11 @@ LQMETClass::LQMETClass(const char* file1, const char* file2)
   //  std::cout<<"comin 3"<<std::endl;                                                                                                                                                               
 
 
-  //std::cout<<"All files added."<<std::endl;
+  std::cout<<"All files added."<<std::endl;
   std::cout<<"Initializing chain."<<std::endl;
   Init(chain);
-  Histograms(file2);
-
+    Histograms(file2);
+    fileName = new TFile(file2, "RECREATE");      
 }//LQMETclass
 
 LQMETClass::~LQMETClass()
@@ -817,6 +851,133 @@ float LQMETClass::compTopPtWeight(float topPt){
 
 
 }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////      getCorrFactorMuon94X       /////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+float LQMETClass::Cor94X_ID_Mu(float pt,float eta, TH2F* HistoId){
+  if (pt > 100 ) pt=100;
+  return HistoId->GetBinContent(HistoId->GetXaxis()->FindBin(pt),HistoId->GetYaxis()->FindBin(fabs(eta)));
+}
+
+
+
+float LQMETClass::Cor94X_Iso_Mu(float pt, float eta , TH2F * HistoIso) {
+  if (pt > 100 ) pt=100;
+  return HistoIso->GetBinContent(HistoIso->GetXaxis()->FindBin(pt),HistoIso->GetYaxis()->FindBin(fabs(eta)));
+}
+
+
+
+float LQMETClass::Cor94X_Trigger_Mu_onlyEta(float eta, TH1F* HistoTrg ){
+  return HistoTrg->GetBinContent(HistoTrg->GetXaxis()->FindBin(eta));
+}
+
+
+float LQMETClass::Cor94X_TRK_Mu_Full2016(float eta, TGraphAsymmErrors * graph ) {
+  // take the ratio_eff_eta3_dr030e030_corr histogram (as function of eta).
+  double * ipoint=NULL;
+  double x_point,y_sf;
+  ipoint=graph->GetX();
+  if (eta >=(ipoint[0]-graph->GetErrorXlow(0))  && eta < (ipoint[0]+graph->GetErrorXhigh(0)) )  etaPOINT=0 ;
+  else if (eta >= (ipoint[1]-graph->GetErrorXlow(1))  && eta < (ipoint[1]+graph->GetErrorXhigh(1)) ) etaPOINT=1;
+  else if (eta >= (ipoint[2]-graph->GetErrorXlow(2)) && eta < (ipoint[2]+graph->GetErrorXhigh(2)) ) etaPOINT=2;
+  else if (eta >= (ipoint[3]-graph->GetErrorXlow(3)) && eta < (ipoint[3]+graph->GetErrorXhigh(3)) ) etaPOINT=3;
+  else if (eta >= (ipoint[4]-graph->GetErrorXlow(4)) && eta < (ipoint[4]+graph->GetErrorXhigh(4)) ) etaPOINT=4;
+  else if (eta >= (ipoint[5]-graph->GetErrorXlow(5)) && eta < (ipoint[5]+graph->GetErrorXhigh(5)) ) etaPOINT=5;
+  else if (eta >= (ipoint[6]-graph->GetErrorXlow(6)) && eta < (ipoint[6]+graph->GetErrorXhigh(6)) ) etaPOINT=6;
+  else if (eta >= (ipoint[7]-graph->GetErrorXlow(7)) && eta < (ipoint[7]+graph->GetErrorXhigh(7)) ) etaPOINT=7;
+  else if (eta >= (ipoint[8]-graph->GetErrorXlow(8)) && eta < (ipoint[8]+graph->GetErrorXhigh(8)) ) etaPOINT=8;
+  else if (eta >= (ipoint[9]-graph->GetErrorXlow(9)) && eta < (ipoint[9]+graph->GetErrorXhigh(9)) ) etaPOINT=9;
+  else if (eta >= (ipoint[10]-graph->GetErrorXlow(10)) && eta < (ipoint[10]+graph->GetErrorXhigh(10)) ) etaPOINT=10;
+  else if (eta >= (ipoint[11]-graph->GetErrorXlow(11)) && eta < (ipoint[11]+graph->GetErrorXhigh(11)) ) etaPOINT=11;
+  else if (eta >= (ipoint[12]-graph->GetErrorXlow(12)) && eta < (ipoint[12]+graph->GetErrorXhigh(12)) ) etaPOINT=12;
+  else if (eta >= (ipoint[13]-graph->GetErrorXlow(13)) && eta < (ipoint[13]+graph->GetErrorXhigh(13)) ) etaPOINT=13;
+  else if (eta >= (ipoint[14]-graph->GetErrorXlow(14)) && eta < (ipoint[14]+graph->GetErrorXhigh(14)) ) etaPOINT=14;
+  else return 1;
+    
+  graph->GetPoint(etaPOINT,x_point,y_sf);
+  return y_sf;
+    
+}
+
+
+float LQMETClass::getCorrFactorMuon94X(bool isData, float pt, float eta, TH2F ** HistoId, TH2F ** HistoIso,TH1F ** HistoTrg, TGraphAsymmErrors * graph){
+  if (isData)
+    return 1;
+  else{
+        
+    float Weighted_IDSF=Cor94X_ID_Mu(pt,eta,HistoId[0]);
+
+    float Weighted_IsoSF=Cor94X_Iso_Mu(pt,eta,HistoIso[0]);
+
+    float Weighted_TriggerSF=Cor94X_Trigger_Mu_onlyEta(eta,HistoTrg[0]);
+    //        float Weighted_TriggerSF=Cor94X_Trigger_Mu_EtaPt(pt,eta,HistoTrg[0]);
+    float Tracking_SF=Cor94X_TRK_Mu_Full2016(eta, graph);
+                             
+    return (Weighted_IDSF * Weighted_IsoSF * Tracking_SF * Weighted_TriggerSF);
+  }
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////      Functions of muon histograms     ///////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+//std::cout<<"MU ID                               ---------------------------------------"<<std::endl;
+
+
+
+TH2F** LQMETClass::FuncHistMuId(){
+std::cout<<"MU ID -----------------------------------------------------------------------"<<std::endl;                                                                                                   
+  TFile * MuCorrId_BCDEF= TFile::Open(("rootfile/pileup_hists/ID_EfficienciesAndSF_BCDEF.root"));
+  //  TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("NUM_TightID_DEN_genTracks_pt_abseta");
+  TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+  static TH2F* HistoMuId[1]={HistoMuId_BCDEF};
+  return  HistoMuId;
+}
+ 
+
+TH2F** LQMETClass::FuncHistMuIso(){
+std::cout<<"MU Iso -----------------------------------------------------------------------"<<std::endl;                                                                                                   
+  TFile * MuCorrIso_BCDEF= TFile::Open(("rootfile/pileup_hists/MuonIso_Z_RunBCD_prompt80X_7p65.root"));
+  //TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
+  //  TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("MC_NUM_TightRelIso_DEN_TightID_PAR_pt_alleta_bin1");
+  TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("MC_NUM_TightRelIso_DEN_TightID_PAR_pt_alleta_bin1/pt_ratio");
+  static  TH2F* HistoMuIso[1]={HistoMuIso_BCDEF};
+  return HistoMuIso;
+}
+
+                                                             
+
+
+
+
+TH1F** LQMETClass::FuncHistMuTrigger(){
+std::cout<<"Trigger -----------------------------------------------------------------------"<<std::endl;                                                                                                  
+  TFile * MuCorrTrg_BCDEF= TFile::Open(("rootfile/pileup_hists/Trigger_EfficienciesAndSF_RunBtoF.root"));
+  //TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_EtaBins/eta_ratio");
+  TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_OR_TkMu50_EtaBins/eta_ratio");
+  static TH1F* HistoMuTrg[2]={HistoMuTrg_BCDEF};
+  return HistoMuTrg;
+}
+
+
+
+TGraphAsymmErrors* LQMETClass::FuncHistMuTrack(){
+std::cout<<"track -----------------------------------------------------------------------"<<std::endl;                                                                                                   
+  TFile * MuCorrTrack= TFile::Open(("rootfile/pileup_hists/Tracking_EfficienciesAndSF_BCDEFGH.root"));
+  TGraphAsymmErrors * HistoMuTrack= (TGraphAsymmErrors *) MuCorrTrack->Get("ratio_eff_eta3_dr030e030_corr");
+  return HistoMuTrack;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////                   compTopPtWeight                     ///////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 float LQMETClass::compTopPtWeight(float top1Pt, float top2Pt){
@@ -858,8 +1019,12 @@ std::vector<float> LQMETClass::GeneratorInfo(){
    
     //Z Pt
     if (fabs(mcPID->at(igen)) ==23)  ZBosonPt= mcPt->at(igen); //FIXME somethime we do not have Z in the DY events
-    if ( mcPID->at(igen) ==13  )  {GenMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen)); modPDGId=mcPID->at(igen);}
-    if ( mcPID->at(igen) ==-13  )  {GenAntiMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen)); AntimodPDGId=mcPID->at(igen);}
+    //    if ( mcPID->at(igen) ==13  )  {GenMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen)); modPDGId=mcPID->at(igen);}
+    //if ( mcPID->at(igen) ==-13  )  {GenAntiMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen)); AntimodPDGId=mcPID->at(igen);}
+
+    if ( mcPID->at(igen) ==13  )  {GenMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen));}
+    if ( mcPID->at(igen) ==-13  )  {GenAntiMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen));}
+
  }
  TopPtReweighting=compTopPtWeight(GenTopPt, GenAntiTopPt);
  if (ZBosonPt ==0)
@@ -889,6 +1054,27 @@ std::vector<float> LQMETClass::GeneratorInfo(){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                              
 ////////////////////////////////////////////         Number functonf for Jets,BJets,ZBoson            //////////////////////////////////////////////////////////////////////                              
+
+
+
+
+
+//###########      num Tau   ########################################################### 
+/*int LQMETClass::getNumTau(){
+  int numTau=0;
+  for  (int itau=0 ; itau < nTau; itau++){
+    if (tau_Pt->at(itau) < 20  || fabs(tau_Eta->at(itau)) > 2.3 ) continue;
+        
+    bool TauIdIso =  taupfTausDiscriminationByDecayModeFinding->at(itau) > 0.5 && tauByLooseMuonRejection3->at(itau) > 0 && tauByMVA6LooseElectronRejection->at(itau) > 0 && tauByLooseIsolationMVArun2v1DBoldDMwLT->at(itau) > 0;
+        
+    if (!TauIdIso) continue;
+    numTau++;
+  }
+  return numTau;
+}
+*/
+
+
 //###########       bJet multiplicity   ########################################################### 
 int LQMETClass::getNumBJets(float BJetPtCut,float CSVCut)
 {
