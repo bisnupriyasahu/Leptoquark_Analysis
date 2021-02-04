@@ -1,0 +1,17 @@
+git add .
+git commit -a -m ""
+git push origin master
+userid and password of github
+
+
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+fatal: Unable to create '/afs/hep.wisc.edu/home/bsahu/Muonanalyzer/CMSSW_9_4_9/src/Muon_Analyzer/MuonAnalyzer/test/Leptoquark_Analysis/.git/index.lock': File exists.
+
+If no other git process is currently running, this probably means a
+git process crashed in this repository earlier. Make sure no other git
+process is running and remove the file manually to continue.
+/////////////////////////////////////////////////////////////////////////////////////////////
+ rm -f ./.git/index.lock
+solve the eoor
+#/////////////////////////////////////////////////////////////
