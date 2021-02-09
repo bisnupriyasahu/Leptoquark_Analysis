@@ -239,7 +239,7 @@ void LQMETClass::Loop(Long64_t maxEvents, int reportEvery)
 	std::cout<<"coming till punummc "<<std::endl;
 	int puNUmdata = int(puTrue->at(0)*5);
 	std::cout<<"coming till pummdata "<<std::endl;
-	float PUMC_; //HistoPUMC->GetBinContent(puNUmmc+1);
+	float PUMC_= HistoPUMC->GetBinContent(puNUmmc+1);
 	std::cout<<"coming till pumc_ "<<PUMC_<<std::endl;
 	float PUData_ = HistoPUData->GetBinContent(puNUmdata+1);
 	std::cout<<"PUData_"<<PUData_<<std::endl;

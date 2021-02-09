@@ -1004,10 +1004,10 @@ std::cout<<"endPUDAta-----------------------------------------------------------
 
 
 TH1F * LQMETClass::HistPUMC(bool isData,TFile *f_Double){
-  /*
+  
      if (isData) return 0;
   else{
-        //    TFile * PUMC= TFile::Open("../interface/pileup-hists/mcMoriondPU.root");
+    /*    //    TFile * PUMC= TFile::Open("../interface/pileup-hists/mcMoriondPU.root");
     //    TH1F * HistoPUMC= (TH1F *) PUMC->Get("pileup");
     TFile * PUMC= TFile::Open(f_Double->GetName());
  
