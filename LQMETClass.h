@@ -7,99 +7,19 @@
 
 #ifndef LQMETClass_h
 #define LQMETClass_h
-#include <TROOT.h>
-#include <TChain.h>
-#include <TFile.h>
-// Header file for the classes stored in the TTree if any.                                                                                                                                                 
-#include "TLorentzVector.h"
-#include <iostream>
-#include <fstream>
+
+
+#include "TROOT.h"
 #include <sstream>
-#include "vector"
-#include <vector>
-#include <TH2.h>
-#include <TH1.h>
-#include <TSystemFile.h>
-#include <TSystemDirectory.h>
-#include <TChain.h>
-#include "math.h"
-#include "TNtuple.h"
 #include <stdio.h>
+#include <vector>
 #include <utility>
-#include "TGraphAsymmErrors.h"
-#include "plotfill_histo.h"
-#include "Weightclaculator.h"
+#include <iostream>
+#include <map>
 using namespace std;
 
-class LQMETClass {
-public :
 
-  TTree *tree1;
-  TTree          *fChain;   //!pointer to the analyzed TTree or TChain
-  Int_t           fCurrent; //!current Tree number in a TChain
-  TFile *fileName;
-  //  TFile *fileName_input;
-  TFile *f_Double;
-  TSystemFile* filename;
-  TString path;
-  TString  FullPathInputFile;
-  TString dataset;
-TTree *tree;
- TH1F * HistoTot;
- TFile * myFile;
-  TH1F *MUJ_recoHT;
-  TH1F *MUJ_ST;
-  TH1F *Muon_nMu;
-  TH1F *Muon_MuPt;
-  TH1F *Muon_MuEta;
-  TH1F *Muon_MuPhi;
-  TH1F *Jet_JetEta;
-  TH1F *Jet_JetPhi;
-  TH1I *mu_Mu4Momentum;
-  TH1F *Muon_IsoMu;
-  TH2F**  FuncHistMuId();
-  TH2F**  FuncHistMuIso();
-  TH1F**  FuncHistMuTrigger();
-  TGraphAsymmErrors * FuncHistMuTrack();
-  std::string InputROOT;
-  TH1F *  HistPUData();
-  TH1F *  HistPUMC(bool isData,TFile *f_Double);
-  std::vector<float>  GeneratorInfo();                                                                                                                                                                
-  float compTopPtWeight(float topPt);
-  float compTopPtWeight(float top1Pt, float top2Pt);
-  /*  std::vector<string> input;
-
-  map<string, TH1F*>* myMap1;
-  map<string, TH2F*>* myMap2;
-  */
-  int getNumTau();
-  int getNumJets(float SimpleJetPtCut);
-  int getNumBJets(float BJetPtCut,float CSVCut);
-  int getNumZBoson();
-  float TMass_F(float pt3lep, float px3lep, float py3lep, float met, float metPhi);
-  float deltaPhi(float a, float b);
-
-
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  int etaPOINT=-1;
-
-
-  float getCorrFactorMuon94X(bool isData, float pt, float eta, TH2F ** HistoId, TH2F ** HistoIso,TH1F ** HistoTrg, TGraphAsymmErrors * graph);
-  float Cor94X_ID_Mu(float pt,float eta, TH2F* HistoId);
-  float Cor94X_Iso_Mu(float pt, float eta , TH2F * HistoIso);
-  float Cor94X_Trigger_Mu_onlyEta(float eta, TH1F* HistoTrg );
-  float Cor94X_TRK_Mu_Full2016(float eta, TGraphAsymmErrors * graph );
-
-
-
-  //  auto numOf_c_quark=0;                                                                                                                                                                               
-  //auto numOf_s_quark=0;                                                                                                                                                                                 
-
-
-  // Fixed size dimensions of array or collections stored in the TTree if any.
-
-   // Declaration of leaf types
+// Declaration of leaf types
    Int_t           run;
    Long64_t        event;
    Int_t           lumis;
@@ -430,7 +350,7 @@ TTree *tree;
    float LeptonPtCut_=60;
    float LeptonIsoCut=0.15;
    float JetPtCut=100;
-   float MuMass= 0.10565837;
+   //   float MuMass= 0.10565837;
    float SimpleJetPtCut=30;
    float BJetPtCut=30;
    float CSVCut=   0.9693   ;
@@ -439,7 +359,7 @@ TTree *tree;
 
 
 
-
+/*
    // List of branches
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
@@ -767,91 +687,13 @@ TTree *tree;
    TBranch        *b_mcStatus;   //!
    TBranch        *b_mcStatusFlag;   //!
    TBranch        *b_mcIndex;   //!
-
-   LQMETClass(const char* file1, const char* file2);
-   virtual ~LQMETClass();
-   virtual Int_t    Cut(Long64_t entry);
-   virtual Int_t    GetEntry(Long64_t entry);
-   virtual Long64_t LoadTree(Long64_t entry);
-   virtual void     Init(TChain *tree);
-   virtual void     Loop(Long64_t maxEvents, int reportEvery);
-   virtual Bool_t   Notify();
-   virtual void     Show(Long64_t entry = -1);
-   //virtual void Histograms(const char* file2);
-};
-
+*/
 #endif
 
-#ifdef LQMETClass_cxx
-LQMETClass::LQMETClass(const char* file1, const char* file2)
-{
-  TChain *chain = new TChain("phoJetNtuplizer/eventTree");
-  path = file1;
-
-  std::vector<string> input;
-  //input.push_back(*(file1));
-  //  map<string, TH1F*>* myMap1;
-  //map<string, TH2F*>* myMap2;
-    
-
-  TSystemDirectory sourceDir("hi",path);
-  TList* fileList = sourceDir.GetListOfFiles();
-  TIter next(fileList);
-  //TSystemFile* filename;
-  int fileNumber = 0;
-  int maxFiles = -1;
- 
-  std::cout<<"path:"<<path<<std::endl;
-  //std::cout<<"COMMING IN BEFORE PATH"<<std::endl;                                                                                                                                                       
- 
-  while ((filename = (TSystemFile*)next()) && fileNumber >  maxFiles)
-    {
-      // std::cout<<"comin 1"<<std::endl;                                                                                                                                                                 
-      if(fileNumber > 1)
-	{
-	  dataset = "MC_";
-	  FullPathInputFile = (path+filename->GetName());
-	  //if (FullPathInputFile.Contains(dataset)){
-	    // fileName_input = TFile::Open(FullPathInputFile);
-	  //}
-	  TString name = filename->GetName();
-	  //   std::cout<<"comin 2"<<std::endl;                                                                                                                                                           
-	    if(name.Contains(dataset))
-	    {
-	      ///*	   
-	      //  f_Double = TFile::Open(FullPathInputFile);
-	      //    InputROOT= std::string(f_Double->GetName());
-	      //    myFile = TFile::Open(f_Double->GetName());
-	      //    HistoTot = (TH1F*) myFile->Get("hcount");
-		    
-	      //   std::cout<<"InputROOT:"<<InputROOT<<std::endl;
-	      ////std::cout<<"fileName_input;     "<<fileName_input->GetName()<<std::endl; 
-	      std::cout<<"FullPathInputFile"<<FullPathInputFile<<std::endl;
-	      chain->Add(FullPathInputFile);
-	    }//name dataset                                                                                                                                                                              
-	}//file no                                                                                                                                                                                       
-      fileNumber++;
-    }//whileloop                                                                                                                                                                                          
-  //  std::cout<<"comin 3"<<std::endl;                                                                                                                                                               
+//#ifdef LQMETClass_cxx
 
 
-  std::cout<<"All files added."<<std::endl;
-  std::cout<<"Initializing chain."<<std::endl;
-  Init(chain);
-  //Histograms(file2);
-    fileName = new TFile(file2, "RECREATE");      
-}//LQMETclass
-
-LQMETClass::~LQMETClass()
-{
-  if (!fChain) return;
-  delete fChain->GetCurrentFile();
-  fileName->cd();
-  fileName->Write();
-  fileName->Close();
-}
-
-
+   /*
 float LQMETClass::compTopPtWeight(float topPt){
   //Updated values for 13 TeV
   const float a =  0.0615  ;
@@ -1018,7 +860,7 @@ TH1F * LQMETClass::HistPUMC(bool isData,TFile *f_Double){
     return HistoPUMC;
   }
   return 0;
-    */
+    
   std::cout<<"ENDPUMC -----------------------------------------------------------------------"<<std::endl;
 }
 
@@ -1122,8 +964,6 @@ std::vector<float> LQMETClass::GeneratorInfo(){
   }
   return numTau;
 }
-*/
-
 
 //###########       bJet multiplicity   ########################################################### 
 int LQMETClass::getNumBJets(float BJetPtCut,float CSVCut)
@@ -1869,5 +1709,5 @@ Int_t LQMETClass::Cut(Long64_t entry)
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
-}
-#endif // #ifdef LQMETClass_cxx
+}*/
+//#endif // #ifdef LQMETClass_cxx
