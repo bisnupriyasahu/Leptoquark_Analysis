@@ -1,27 +1,94 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun May 10 06:52:28 2020 by ROOT version 6.10/09
+// Mon Apr  5 10:53:10 2021 by ROOT version 6.22/06
 // from TTree eventTree/event tree for analysis
-// found on file: Input_MC_DYJetsToLL_HT100-200_1000.root
+// found on file: /hdfs/store/user/varuns/NTuples/MC/MC2018_RunIIAutumn18_JECv19/DYJets/DYJetsToLL_HT2500-Inf/0000/MC_DYJetsToLL_HT2500-Inf_21.root
 //////////////////////////////////////////////////////////
 
-#ifndef LQMETClass_h
-#define LQMETClass_h
+#ifndef MuonClass_h
+#define MuonClass_h
 
+#include <TROOT.h>
+#include <TChain.h>
+#include <TFile.h>
 
-#include "TROOT.h"
+// Header file for the classes stored in the TTree if any.
+#include "vector"
+#include "vector"
+#include "vector"
+#include "vector"
+#include "vector"
+#include "TTree.h"
+#include "TBrowser.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TH1F.h"
+#include "TRandom.h"
+#include "TCanvas.h"
+#include "math.h"
+#include "TGaxis.h"
+#include "TLegend.h"
+#include "TGraph.h"
+#include "TGraphAsymmErrors.h"
+#include "TInterpreter.h"
+#include "TSystem.h"
+#include "TNtuple.h"
+#include "TPaveLabel.h"
+#include "TPaveText.h"
+#include "TFrame.h"
+#include <fstream>
 #include <sstream>
 #include <stdio.h>
 #include <vector>
 #include <utility>
 #include <iostream>
 #include <map>
+#include "TLorentzVector.h"
+#include "corrector.h"
+#include "plotfill_histo.h"
+#include "Weightclaculator.h"
+#include <TSystemDirectory.h>
 
 using namespace std;
 
+class MuonClass {
+public :
+   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
+   Int_t           fCurrent; //!current Tree number in a TChain
+   TFile *fileName;
+   const char* File2;
+   TTree *tree;
+   float LeptonPtCut_=60;
+   float LeptonIsoCut=0.15;
+   float JetPtCut=100;
+   //   float MuMass= 0.10565837;                                                                                                                                                                         
+   float SimpleJetPtCut=30;
+   float BJetPtCut=30;
+   float CSVCut=   0.9693;
+      //     functions
+   TH2F** FuncHistMuId();
+   TH2F** FuncHistMuIso();
+   TH2F** FuncHistMuTrigger();
+   TGraphAsymmErrors* FuncHistMuTrack();
+   std::vector<float> GeneratorInfo();
+   float FuncBosonKFactor(std::string X);
+   int getNumTau();
+   int getNumElectron();
+   int getNumZBoson();
+   int getnumBJets( float BJetPtCut, float CSVCut);
+   int getnumJets( float SimpleJetPtCut);
+   float compTopPtWeight(float topPt);
+   float compTopPtWeight(float top1Pt, float top2Pt);
+   TH2F **  FuncHistBTagSF();
+   float FuncFinalBTagSF(bool isData, TH2F ** Btagg_TT, float BJetPtCut, float CSVCut);   
+   float MuMass= 0.10565837;
+   float eleMass= 0.000511;
+   TH1F * HistPUData();
+   float getBtagEfficiency(bool isData, bool passCSV, float pt, float eta, TH2F ** Btagg_TT);
+   //  float LeptonPtCut_=60;  
+// Fixed size dimensions of array or collections stored in the TTree if any.
 
-
-// Declaration of leaf types
+   // Declaration of leaf types
    Int_t           run;
    Long64_t        event;
    Int_t           lumis;
@@ -348,19 +415,6 @@ using namespace std;
    vector<int>     *mcStatus;
    vector<unsigned short> *mcStatusFlag;
    vector<int>     *mcIndex;
-
-   float LeptonPtCut_=60;
-   float LeptonIsoCut=0.15;
-   float JetPtCut=100;
-   //   float MuMass= 0.10565837;
-   float SimpleJetPtCut=30;
-   float BJetPtCut=30;
-   float CSVCut=   0.9693   ;
-   //  float LeptonPtCut_=60; 
-
-/*
-
-
 
    // List of branches
    TBranch        *b_run;   //!
@@ -689,192 +743,171 @@ using namespace std;
    TBranch        *b_mcStatus;   //!
    TBranch        *b_mcStatusFlag;   //!
    TBranch        *b_mcIndex;   //!
-*/
+
+   MuonClass(const char* file1, const char* file2);
+   virtual ~MuonClass();
+   virtual Int_t    Cut(Long64_t entry);
+   virtual Int_t    GetEntry(Long64_t entry);
+   virtual Long64_t LoadTree(Long64_t entry);
+   virtual void     Init(TChain *tree);
+   virtual void     Loop(Long64_t maxEvents, int reportEvery);
+   virtual Bool_t   Notify();
+   virtual void     Show(Long64_t entry = -1);
+   // virtual void BookHistos(const char* file2);
+   
+
+};
+
 #endif
 
-//#ifdef LQMETClass_cxx
+#ifdef MuonClass_cxx
+MuonClass::MuonClass(const char* file1, const char* file2) 
+{
+// if parameter tree is not specified (or zero), connect the file
+// used to generate this class and read the Tree.
+   
+  TChain *chain = new TChain("phoJetNtuplizer/eventTree");
+  TString path = file1;
+  std::cout<<"path is:"<<path<<std::endl;
+  TSystemDirectory sourceDir("hi",path);
+  TList* fileList = sourceDir.GetListOfFiles();
+  TIter next(fileList);
+  TSystemFile* filename;
+  int fileNumber = 0;
+  int maxFiles = -1;
 
-
-   /*
-float LQMETClass::compTopPtWeight(float topPt){
-  //Updated values for 13 TeV
-  const float a =  0.0615  ;
-  const float b =  -0.0005 ;
-  //    const float a =  0.148 ;
-  //    const float b =  -0.00129;
-  //    const float a = 0.156;
-  //    const float b = -0.00137;
-  return TMath::Exp(a + b * topPt);
-
-
+  while ((filename = (TSystemFile*)next()) && fileNumber >  maxFiles)
+    //std::cout<<"coming here"<<std::endl;
+    {//std::cout<<"Comin in hpath"<<std::endl;                                                                                                                                                             
+      if(fileNumber > 1)
+        {
+          TString dataset = "MC";
+          TString  FullPathInputFile = (path+filename->GetName());
+           std::cout<<"Comin in hpath1"<<std::endl;                                                                                                                                                      
+          TString name = filename->GetName();
+          if(name.Contains(dataset))
+            {
+	      std::cout<<"FullPathInputFile is    :"<<FullPathInputFile<<std::endl;
+              chain->Add(FullPathInputFile);
+	      std::cout<<"chainentries   "<<chain->GetEntries()<<std::endl;
+	    }
+        }
+      fileNumber++;
+    }
+  std::cout<<"All files added."<<std::endl;
+  std::cout<<"Initializing chain."<<std::endl;
+  Init(chain);
+   File2 = file2;
+   //BookHistos(file2);
 }
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////      getCorrFactorMuon94X       /////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-float LQMETClass::Cor94X_ID_Mu(float pt,float eta, TH2F* HistoId){
-  if (pt > 100 ) pt=100;
-  return HistoId->GetBinContent(HistoId->GetXaxis()->FindBin(pt),HistoId->GetYaxis()->FindBin(fabs(eta)));
+MuonClass::~MuonClass()
+{
+   if (!fChain) return;
+   delete fChain->GetCurrentFile();
+   fileName->cd();
+   fileName->Write();
+    //tree->Write();
+      fileName->Close();
 }
 
-
-
-float LQMETClass::Cor94X_Iso_Mu(float pt, float eta , TH2F * HistoIso) {
-  if (pt > 100 ) pt=100;
-  return HistoIso->GetBinContent(HistoIso->GetXaxis()->FindBin(pt),HistoIso->GetYaxis()->FindBin(fabs(eta)));
+Int_t MuonClass::GetEntry(Long64_t entry)
+{
+// Read contents of entry.
+   if (!fChain) return 0;
+   return fChain->GetEntry(entry);
+}
+Long64_t MuonClass::LoadTree(Long64_t entry)
+{
+// Set the environment to read one entry
+   if (!fChain) return -5;
+   Long64_t centry = fChain->LoadTree(entry);
+   if (centry < 0) return centry;
+   if (fChain->GetTreeNumber() != fCurrent) {
+      fCurrent = fChain->GetTreeNumber();
+      Notify();
+   }
+   return centry;
 }
 
-
-
-float LQMETClass::Cor94X_Trigger_Mu_onlyEta(float eta, TH1F* HistoTrg ){
-  return HistoTrg->GetBinContent(HistoTrg->GetXaxis()->FindBin(eta));
-}
-
-
-float LQMETClass::Cor94X_TRK_Mu_Full2016(float eta, TGraphAsymmErrors * graph ) {
-  // take the ratio_eff_eta3_dr030e030_corr histogram (as function of eta).
-  double * ipoint=NULL;
-  double x_point,y_sf;
-  ipoint=graph->GetX();
-  if (eta >=(ipoint[0]-graph->GetErrorXlow(0))  && eta < (ipoint[0]+graph->GetErrorXhigh(0)) )  etaPOINT=0 ;
-  else if (eta >= (ipoint[1]-graph->GetErrorXlow(1))  && eta < (ipoint[1]+graph->GetErrorXhigh(1)) ) etaPOINT=1;
-  else if (eta >= (ipoint[2]-graph->GetErrorXlow(2)) && eta < (ipoint[2]+graph->GetErrorXhigh(2)) ) etaPOINT=2;
-  else if (eta >= (ipoint[3]-graph->GetErrorXlow(3)) && eta < (ipoint[3]+graph->GetErrorXhigh(3)) ) etaPOINT=3;
-  else if (eta >= (ipoint[4]-graph->GetErrorXlow(4)) && eta < (ipoint[4]+graph->GetErrorXhigh(4)) ) etaPOINT=4;
-  else if (eta >= (ipoint[5]-graph->GetErrorXlow(5)) && eta < (ipoint[5]+graph->GetErrorXhigh(5)) ) etaPOINT=5;
-  else if (eta >= (ipoint[6]-graph->GetErrorXlow(6)) && eta < (ipoint[6]+graph->GetErrorXhigh(6)) ) etaPOINT=6;
-  else if (eta >= (ipoint[7]-graph->GetErrorXlow(7)) && eta < (ipoint[7]+graph->GetErrorXhigh(7)) ) etaPOINT=7;
-  else if (eta >= (ipoint[8]-graph->GetErrorXlow(8)) && eta < (ipoint[8]+graph->GetErrorXhigh(8)) ) etaPOINT=8;
-  else if (eta >= (ipoint[9]-graph->GetErrorXlow(9)) && eta < (ipoint[9]+graph->GetErrorXhigh(9)) ) etaPOINT=9;
-  else if (eta >= (ipoint[10]-graph->GetErrorXlow(10)) && eta < (ipoint[10]+graph->GetErrorXhigh(10)) ) etaPOINT=10;
-  else if (eta >= (ipoint[11]-graph->GetErrorXlow(11)) && eta < (ipoint[11]+graph->GetErrorXhigh(11)) ) etaPOINT=11;
-  else if (eta >= (ipoint[12]-graph->GetErrorXlow(12)) && eta < (ipoint[12]+graph->GetErrorXhigh(12)) ) etaPOINT=12;
-  else if (eta >= (ipoint[13]-graph->GetErrorXlow(13)) && eta < (ipoint[13]+graph->GetErrorXhigh(13)) ) etaPOINT=13;
-  else if (eta >= (ipoint[14]-graph->GetErrorXlow(14)) && eta < (ipoint[14]+graph->GetErrorXhigh(14)) ) etaPOINT=14;
-  else return 1;
-    
-  graph->GetPoint(etaPOINT,x_point,y_sf);
-  return y_sf;
-    
-}
-
-
-float LQMETClass::getCorrFactorMuon94X(bool isData, float pt, float eta, TH2F ** HistoId, TH2F ** HistoIso,TH1F ** HistoTrg, TGraphAsymmErrors * graph){
-  if (isData)
-    return 1;
-  else{
-        
-    float Weighted_IDSF=Cor94X_ID_Mu(pt,eta,HistoId[0]);
-
-    float Weighted_IsoSF=Cor94X_Iso_Mu(pt,eta,HistoIso[0]);
-
-    float Weighted_TriggerSF=Cor94X_Trigger_Mu_onlyEta(eta,HistoTrg[0]);
-    //        float Weighted_TriggerSF=Cor94X_Trigger_Mu_EtaPt(pt,eta,HistoTrg[0]);
-    float Tracking_SF=Cor94X_TRK_Mu_Full2016(eta, graph);
-                             
-    return (Weighted_IDSF * Weighted_IsoSF * Tracking_SF * Weighted_TriggerSF);
-  }
-    
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////      Functions of muon histograms     ///////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-//std::cout<<"MU ID                               ---------------------------------------"<<std::endl;
-
-
-
-TH2F** LQMETClass::FuncHistMuId(){
-std::cout<<"MU ID -----------------------------------------------------------------------"<<std::endl;                                                                                                   
-  TFile * MuCorrId_BCDEF= TFile::Open(("rootfile/pileup_hists/RunABCD_SF_ID.root"));
-  //  TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("NUM_TightID_DEN_genTracks_pt_abseta");
+TH2F** MuonClass::FuncHistMuId()
+{
+  //  std::cout<<"MU ID -----------------------------------------------------------------------"<<std::endl;
+  TFile * MuCorrId_BCDEF= TFile::Open(("RunABCD_SF_ID.root"));
+  //  TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("NUM_TightID_DEN_genTracks_pt_abseta");                                                                                                        
   TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("NUM_TightID_DEN_TrackerMuons_pt_abseta");
   static TH2F* HistoMuId[1]={HistoMuId_BCDEF};
   return  HistoMuId;
 }
- 
 
-TH2F** LQMETClass::FuncHistMuIso(){
-std::cout<<"MU Iso -----------------------------------------------------------------------"<<std::endl;                                                                                                   
-  TFile * MuCorrIso_BCDEF= TFile::Open(("rootfile/pileup_hists/RunABCD_SF_ISO.root"));
-  //TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
-  //  TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("MC_NUM_TightRelIso_DEN_TightID_PAR_pt_alleta_bin1");
+TH2F** MuonClass::FuncHistMuIso()
+{  //std::cout<<"MU Iso -----------------------------------------------------------------------"<<std::endl;
+  TFile * MuCorrIso_BCDEF= TFile::Open(("RunABCD_SF_ISO.root"));
+  //TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");                                                                                              
+  //  TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("MC_NUM_TightRelIso_DEN_TightID_PAR_pt_alleta_bin1");                                                                                        
   TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
   static  TH2F* HistoMuIso[1]={HistoMuIso_BCDEF};
   return HistoMuIso;
 }
 
-                                                             
-
-
-
-
-TH1F** LQMETClass::FuncHistMuTrigger(){
-std::cout<<"Trigger -----------------------------------------------------------------------"<<std::endl;                                                                                                  
-  TFile * MuCorrTrg_BCDEF= TFile::Open(("rootfile/pileup_hists/EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root"));
-  //TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_EtaBins/eta_ratio");
-  TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_OR_OldMu100_OR_TkMu100_EtaBins/eta_ratio");
-  static TH1F* HistoMuTrg[2]={HistoMuTrg_BCDEF};
-  return HistoMuTrg;
+/*
+TH2F** MuonClass::FuncHistMuTrigger()
+{
+  TFile * MuCorrTrg_BCDEF= TFile::Open(("EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root"));
+  //TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_EtaBins/eta_ratio");                                                                                                                      
+  TH2F * HistoMuTrg_BCDEF= (TH2F *) MuCorrTrg_BCDEF->Get("Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio");
+  static TH2F* HistoMuTrg[2]={HistoMuTrg_BCDEF};
+std::cout<<"Trigger -----------------------------------------------------------------------"<<std::endl; 
+ return HistoMuTrg;
 }
 
+*/
+TH2F** MuonClass::FuncHistMuTrigger(){                                                                                                                                                                    
+  std::cout<<"Trigger -----------------------------------------------------------------------"<<std::endl;                                                                                                
+  TFile * MuCorrTrg_BCDEF= TFile::Open("EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root");                                                                                     
+  //TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_EtaBins/eta_ratio");                                                                                                                     
+  TH2F * HistoMuTrg_BCDEF= (TH2F *) MuCorrTrg_BCDEF->Get("Mu50_OR_OldMu100_OR_TkMu100_EtaBins/eta_ratio");                                                                                                
+  static TH2F* HistoMuTrg[2]={HistoMuTrg_BCDEF};                                                                                                                                                          
+  return HistoMuTrg;                                                                                                                                                                                      
+}
 
-
-TGraphAsymmErrors* LQMETClass::FuncHistMuTrack(){
-std::cout<<"track -----------------------------------------------------------------------"<<std::endl;                                                                                                   
-  TFile * MuCorrTrack= TFile::Open(("rootfile/pileup_hists/Tracking_EfficienciesAndSF_BCDEFGH.root"));
+/////////////////////////////////////////////   pileup Histogram functions     ////////////////////////////////////
+TH1F *  MuonClass::HistPUData(){
+  std::cout<<"endPUDAta-----------------------------------------------------------------------"<<std::endl;
+  TFile * PUData= TFile::Open("rootfile/pileup_hists/Data_nPU_new.root");
+  TH1F * HistoPUData= (TH1F *) PUData->Get("pileup");
+  HistoPUData->Rebin(2);
+  HistoPUData->Scale(1.0/HistoPUData->Integral());
+  cout << "HistoPUData integral= "<<HistoPUData->Integral()<<"\n";
+  return HistoPUData;
+}
+TGraphAsymmErrors* MuonClass::FuncHistMuTrack()
+{//std::cout<<"track -----------------------------------------------------------------------"<<std::endl; 
+  TFile * MuCorrTrack= TFile::Open(("Tracking_EfficienciesAndSF_BCDEFGH.root"));
   TGraphAsymmErrors * HistoMuTrack= (TGraphAsymmErrors *) MuCorrTrack->Get("ratio_eff_eta3_dr030e030_corr");
   return HistoMuTrack;
 }
 
 
+//########################################
+// Btagging scale factor This part is the outcome of the CodexAnalyzer_BTagEff.cc
+//########################################
 
-/////////////////////////////////////////////   pileup Histogram functions     ////////////////////////////////////
-TH1F *  LQMETClass::HistPUData(){
-std::cout<<"endPUDAta-----------------------------------------------------------------------"<<std::endl;
- TFile * PUData= TFile::Open("rootfile/pileup_hists/Data_nPU_new.root");
-  TH1F * HistoPUData= (TH1F *) PUData->Get("pileup");
-  HistoPUData->Rebin(2);
-  HistoPUData->Scale(1.0/HistoPUData->Integral());
-     cout << "HistoPUData integral= "<<HistoPUData->Integral()<<"\n";
-  return HistoPUData;
-
-}
-
-
-
-TH1F * LQMETClass::HistPUMC(bool isData,TFile *f_Double){
-  /*
-     if (isData) return 0;
-  else{
-        //    TFile * PUMC= TFile::Open("../interface/pileup-hists/mcMoriondPU.root");
-    //    TH1F * HistoPUMC= (TH1F *) PUMC->Get("pileup");
-    TFile * PUMC= TFile::Open(f_Double->GetName());
- 
-    std::cout<<"PUMC files"<<PUMC<<std::endl;
-   TH1F * HistoPUMC= (TH1F *) PUMC->Get("hPUTrue");
-    HistoPUMC->Scale(1.0/HistoPUMC->Integral());
-           cout << "HistoPUMC integral= "<<HistoPUMC->Integral()<<"\n";
-    return HistoPUMC;
-  }
-  return 0;
+TH2F** MuonClass::FuncHistBTagSF(){
+  TFile * TTEff= TFile::Open(("TTJets.root"));
+  TH2F * TTSF0_btagged= (TH2F *) TTEff->Get("BSF_FLV0_Btagged");
+  TH2F * TTSF0_total= (TH2F *) TTEff->Get("BSF_FLV0_Total");
+  TH2F * TTSF5_btagged= (TH2F *) TTEff->Get("BSF_FLV5_Btagged");
+  TH2F * TTSF5_total= (TH2F*) TTEff->Get("BSF_FLV5_Total");
     
-  std::cout<<"ENDPUMC -----------------------------------------------------------------------"<<std::endl;
+  static TH2F * Btagg_TT[4]={TTSF0_btagged,TTSF0_total,TTSF5_btagged,TTSF5_total};
+    
+  return Btagg_TT;
 }
 
 
- 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////                   compTopPtWeight                     ///////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-float LQMETClass::compTopPtWeight(float top1Pt, float top2Pt){
+float MuonClass::compTopPtWeight(float top1Pt, float top2Pt){
   //std::cout << "<compTopPtWeight>:" << std::endl;
   float topPtWeight2 = compTopPtWeight(top1Pt) * compTopPtWeight(top2Pt);
   //std::cout << " top1Pt = " << top1Pt << ", top2Pt = " << top2Pt << ": topPtWeight2 = " << topPtWeight2 << std::endl;
@@ -882,9 +915,9 @@ float LQMETClass::compTopPtWeight(float top1Pt, float top2Pt){
 }
 
 
-std::vector<float> LQMETClass::GeneratorInfo(){                                                                                                                                                         
- 
 
+std::vector<float> MuonClass::GeneratorInfo(){                                                                                                                                                         
+ 
   vector<float>    infoGen;                                                                                                                                                                               
   infoGen.clear();                                                                                                                                                                                        
   float GenTopPt=0;                                                                                                                                                                                       
@@ -898,7 +931,7 @@ std::vector<float> LQMETClass::GeneratorInfo(){
   int AntimodPDGId=-10;                                                                                                                                                                                   
   float WBosonMass=0;                                                                                                                                                                                     
   TLorentzVector GenMu4Momentum,GenAntiMu4Momentum, WGEN4Momentum, MUGEN4Momentum, NUGEN4Momentum;                                                                                                      
- for (int igen=0;igen < nMC; igen++){                                                                                                                                                                   
+  for (int igen=0;igen < nMC; igen++){                                                                                                                                                                   
     if (mcPID->at(igen) == 6 && mcStatus->at(igen) ==62) GenTopPt=mcPt->at(igen) ;                                                                                                                        
     if (mcPID->at(igen) == -6 && mcStatus->at(igen) ==62) GenAntiTopPt=mcPt->at(igen);                                                                                                                    
     //W Pt
@@ -915,60 +948,135 @@ std::vector<float> LQMETClass::GeneratorInfo(){
     if (fabs(mcPID->at(igen)) ==23)  ZBosonPt= mcPt->at(igen); //FIXME somethime we do not have Z in the DY events
     //    if ( mcPID->at(igen) ==13  )  {GenMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen)); modPDGId=mcPID->at(igen);}
     //if ( mcPID->at(igen) ==-13  )  {GenAntiMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen)); AntimodPDGId=mcPID->at(igen);}
-
     if ( mcPID->at(igen) ==13  )  {GenMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen));}
     if ( mcPID->at(igen) ==-13  )  {GenAntiMu4Momentum.SetPtEtaPhiM(mcPt->at(igen),mcEta->at(igen),mcPhi->at(igen),mcMass->at(igen));}
-
- }
- TopPtReweighting=compTopPtWeight(GenTopPt, GenAntiTopPt);
- if (ZBosonPt ==0)
-   ZBosonPt=(GenMu4Momentum+GenAntiMu4Momentum).Pt();  //This is a temp solution to the above problem
+  }
+  TopPtReweighting=compTopPtWeight(GenTopPt, GenAntiTopPt);
+  if (ZBosonPt ==0)
+    ZBosonPt=(GenMu4Momentum+GenAntiMu4Momentum).Pt();  //This is a temp solution to the above problem
  
- if (WBosonPt==0)
-   WBosonPt = (MUGEN4Momentum+NUGEN4Momentum).Pt();
+  if (WBosonPt==0)
+    WBosonPt = (MUGEN4Momentum+NUGEN4Momentum).Pt();
             
- //######################## Top Pt Reweighting
- infoGen.push_back(TopPtReweighting);
+  //######################## Top Pt Reweighting
+  infoGen.push_back(TopPtReweighting);
     
- //######################## W Pt
- infoGen.push_back(WBosonPt);
+  //######################## W Pt
+  infoGen.push_back(WBosonPt);
     
- //######################## Z Pt
- infoGen.push_back(ZBosonPt);
+  //######################## Z Pt
+  infoGen.push_back(ZBosonPt);
     
- //######################## W Mass
- infoGen.push_back(WBosonMass);
+  //######################## W Mass
+  infoGen.push_back(WBosonMass);
     
- return infoGen;
-
-
+  return infoGen;
 }                                                                                                                                                                                                         
 
+float MuonClass::compTopPtWeight(float topPt){
+  //Updated values for 13 TeV
+  const float a =  0.0615  ;
+  const float b =  -0.0005 ;
+  //    const float a =  0.148 ;
+  //    const float b =  -0.00129;
+  //    const float a = 0.156;
+  //    const float b = -0.00137;
+  return TMath::Exp(a + b * topPt);
+}
+
+//########################################
+// W and DY K-factor files  (FIT-based K-factor)
+//########################################
+
+TFile * kfactorW=TFile::Open("kfactor_W.root");
+TH1F* HistkfactorW= (TH1F*) kfactorW->Get("KFcator");
+float kf_W_1=HistkfactorW->GetBinContent(1);
+float kf_W_2=HistkfactorW->GetBinContent(2);
+
+
+TFile * kfactorWUp=TFile::Open("kfactor_monoJet_WUp.root");
+TH1F* HistkfactorWUp= (TH1F*) kfactorWUp->Get("KFcator");
+float kf_W_1Up=HistkfactorWUp->GetBinContent(1);
+float kf_W_2Up=HistkfactorWUp->GetBinContent(2);
+
+TFile * kfactorWDown=TFile::Open("kfactor_monoJet_WDown.root");
+TH1F* HistkfactorWDown= (TH1F*) kfactorWDown->Get("KFcator");
+float kf_W_1Down=HistkfactorWDown->GetBinContent(1);
+float kf_W_2Down=HistkfactorWDown->GetBinContent(2);
+
+
+
+TFile * kfactorZ=TFile::Open("kfactor_Z.root");
+TH1F* HistkfactorZ= (TH1F*) kfactorZ->Get("KFcator");
+float kf_Z_1=HistkfactorZ->GetBinContent(1);
+float kf_Z_2=HistkfactorZ->GetBinContent(2);
+
+
+TFile * kfactorZUp=TFile::Open("kfactor_monoJet_ZUp.root");
+TH1F* HistkfactorZUp= (TH1F*) kfactorZUp->Get("KFcator");
+float kf_Z_1Up=HistkfactorZUp->GetBinContent(1);
+float kf_Z_2Up=HistkfactorZUp->GetBinContent(2);
+
+TFile * kfactorZDown=TFile::Open("kfactor_monoJet_ZDown.root");
+TH1F* HistkfactorZDown= (TH1F*) kfactorZDown->Get("KFcator");
+float kf_Z_1Down=HistkfactorZDown->GetBinContent(1);
+float kf_Z_2Down=HistkfactorZDown->GetBinContent(2);
+
+
+
+
+float MuonClass::FuncBosonKFactor(std::string X){
+    
+  if (X.find("W1Cen") != string::npos)
+    return kf_W_1;
+  else if (X.find("W2Cen") != string::npos)
+    return kf_W_2;
+  else if (X.find("W1Up") != string::npos)
+    return kf_W_1Up;
+  else if (X.find("W2Up") != string::npos)
+    return kf_W_2Up;
+  else if (X.find("W1Down") != string::npos)
+    return kf_W_1Down;
+  else if (X.find("W2Down") != string::npos)
+    return kf_W_2Down;
+    
+  else if (X.find("Z1Cen") != string::npos)
+    return kf_Z_1;
+  else if (X.find("Z2Cen") != string::npos)
+    return kf_Z_2;
+  else if (X.find("Z1Up") != string::npos)
+    return kf_Z_1Up;
+  else if (X.find("Z2Up") != string::npos)
+    return kf_Z_2Up;
+  else if (X.find("Z1Down") != string::npos)
+    return kf_Z_1Down;
+  else if (X.find("Z2Down") != string::npos)
+    return kf_Z_2Down;
+    
+    
+  else
+    return 0;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                              
 ////////////////////////////////////////////         Number functonf for Jets,BJets,ZBoson            //////////////////////////////////////////////////////////////////////                              
-
-
-
-
-
 //###########      num Tau   ########################################################### 
-/*int LQMETClass::getNumTau(){
+int MuonClass::getNumTau(){
   int numTau=0;
   for  (int itau=0 ; itau < nTau; itau++){
     if (tau_Pt->at(itau) < 20  || fabs(tau_Eta->at(itau)) > 2.3 ) continue;
         
-    bool TauIdIso =  taupfTausDiscriminationByDecayModeFinding->at(itau) > 0.5 && tauByLooseMuonRejection3->at(itau) > 0 && tauByMVA6LooseElectronRejection->at(itau) > 0 && tauByLooseIsolationMVArun2v1DBoldDMwLT->at(itau) > 0;
-        
+    //    bool TauIdIso;// =  taupfTausDiscriminationByDecayModeFinding->at(itau) > 0.5 && tauByLooseMuonRejection3->at(itau) > 0 && tauByMVA6LooseElectronRejection->at(itau) > 0 && tauByLooseIsolationMVArun2v1DBoldDMwLT->at(itau) > 0;
+    bool TauIdIso = ((*tau_IDbits)[itau]>>0&1 == 1 && ((*tau_IDbits)[itau]>>2&1 == 1)> 0 && ((*tau_IDbits)[itau]>>5&1 == 1) > 0 && ((*tau_IDbits)[itau]>>14&1 == 1) > 0);
+
     if (!TauIdIso) continue;
     numTau++;
   }
   return numTau;
 }
-
 //###########       bJet multiplicity   ########################################################### 
-int LQMETClass::getNumBJets(float BJetPtCut,float CSVCut)
+int MuonClass::getnumBJets(float BJetPtCut,float CSVCut)
 {
   int numBJet=0;
   for (int ijet= 0 ; ijet < nJet ; ijet++){
@@ -988,11 +1096,90 @@ int LQMETClass::getNumBJets(float BJetPtCut,float CSVCut)
   return numBJet;
 }
 
+float MuonClass::getBtagEfficiency(bool isData, bool passCSV, float pt, float eta, TH2F ** Btagg_TT){
+    
+    
+  if ( isData) return 1;
+    
+    
+    
+  int ptBIN;
+  if ( pt < 50 ) ptBIN=1;
+  if (pt >= 50 && pt < 70 ) ptBIN=2;
+  if (pt >= 70 && pt < 100 ) ptBIN=3;
+  if (pt >= 100 && pt < 140) ptBIN=4;
+  if (pt >= 140 && pt < 200) ptBIN=5;
+  if (pt >= 200 && pt < 300) ptBIN=6;
+  if (pt >= 300 && pt < 600) ptBIN=7;
+  if (pt >= 600 ) ptBIN=8;
+    
+  int etaBIN;
+  if (eta >= 0 && eta < 0.8 ) etaBIN=1;
+  if (eta >= 0.8 && eta < 1.5 ) etaBIN=2;
+  if (eta >= 1.5 ) etaBIN=3;
+    
+    
+    
+  TH2F * TTSF0_btagged=Btagg_TT[0];
+  TH2F * TTSF0_total=Btagg_TT[1];
+  TH2F * TTSF5_btagged=Btagg_TT[2];
+  TH2F * TTSF5_total=Btagg_TT[3];
+    
+  //    cout << "Btag efficiency is = "<< pt << " ptBIN " <<ptBIN << "   "<<eta << " etaBIN " << etaBIN <<"  ratio=  " <<TTSF0_btagged->GetBinContent(ptBIN,etaBIN) << "    "<<TTSF0_total->GetBinContent(ptBIN,etaBIN) <<"\n";
+    
+    
+  if (passCSV)
+    return  TTSF5_btagged->GetBinContent(ptBIN,etaBIN)*1.0/TTSF5_total->GetBinContent(ptBIN,etaBIN);
+  else
+    return  TTSF0_btagged->GetBinContent(ptBIN,etaBIN)*1.0/TTSF0_total->GetBinContent(ptBIN,etaBIN);
+    
+    
+}
+
+float MuonClass::FuncFinalBTagSF(bool isData, TH2F ** Btagg_TT, float BJetPtCut, float CSVCut){
+    
+    
+  float EffJet =1;
+  float SF=1;
+  float P_Data_P_mc=1;
+  float FinalBTagSF=1;
+    
+  if (isData) return 1;
+  for (int ijet= 0 ; ijet < nJet ; ijet++){
+        
+    float HadronFlavor= isData ? 1 : jetHadFlvr->at(ijet);
+    //  if (jetPFLooseId->at(ijet) > 0.5 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 ){
+    if ((*jetID)[ijet]>>0&1 == 1 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 ){
+            
+           
+      if ( jetCSV2BJetTags->at(ijet) >  CSVCut ){
+	EffJet= getBtagEfficiency( isData, 1,  jetPt->at(ijet), fabs(jetEta->at(ijet)), Btagg_TT);
+	SF= GetBJetSF(isData, jetPt->at(ijet), jetPt->at(ijet), HadronFlavor);
+	P_Data_P_mc=SF*EffJet/EffJet;
+                
+                
+      }
+      else{
+	EffJet= getBtagEfficiency( isData, 0,  jetPt->at(ijet), fabs(jetEta->at(ijet)), Btagg_TT);
+	SF=GetBJetSF(isData,jetPt->at(ijet), jetPt->at(ijet), HadronFlavor);
+	P_Data_P_mc=(1-SF*EffJet)/(1-EffJet);
+                
+      }
+      FinalBTagSF *=P_Data_P_mc;
+    }
+        
+    //        FinalBTagSF *=P_Data_P_mc; //  Seemd to ve a BUGGGGGGG  May16
+  }
+  return FinalBTagSF;
+}
+
+
+
+
 //###########       Jet multiplicity   ###########################################################                                                                                                        
  
-int LQMETClass::getNumJets(float SimpleJetPtCut){
+int MuonClass::getnumJets(float SimpleJetPtCut){
   int numJet=0;
-
   //std::cout<<"jetPt->at(ijet) "<<jetPt->at(ijet)<<std::endl;                                                                                                                                            
  
   std::cout<<"SimpleJetPtCut      "<<SimpleJetPtCut<<std::endl;
@@ -1006,82 +1193,76 @@ int LQMETClass::getNumJets(float SimpleJetPtCut){
     if ((*jetID)[ijet]>>0&1 == 1 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
       numJet++;
     std::cout<<"numJet   "<<numJet<<std::endl;
-
     // std::cout<<"jetPFLooseId->at(ijet)   "<<jetPFLooseId->at(ijet)<<std::endl;                                                                                                                         
   }
   return numJet;
 }
-
 //###########       ZBoson multiplicity   ###########################################################                                                                                                     
  
-
-Int_t LQMETClass::getNumZBoson(){
+Int_t MuonClass::getNumZBoson(){
   int numZboson=0;
   for (int xmu=0; xmu< nMu; xmu++){
     for (int ymu=xmu+1; ymu< nMu; ymu++){
-
       TLorentzVector Mu4Momentum_0,Mu4Momentum_1,Z4Momentum;
       Mu4Momentum_0.SetPtEtaPhiM(muPt->at(xmu),muEta->at(xmu),muPhi->at(xmu),MuMass);
       Mu4Momentum_1.SetPtEtaPhiM(muPt->at(ymu),muEta->at(ymu),muPhi->at(ymu),MuMass);
       Z4Momentum=Mu4Momentum_1+Mu4Momentum_0;
-
       float IsoMu1=muPFChIso->at(xmu)/muPt->at(xmu);
       if ( (muPFNeuIso->at(xmu) + muPFPhoIso->at(xmu) - 0.5* muPFPUIso->at(xmu) )  > 0.0)
         IsoMu1= ( muPFChIso->at(xmu)/muPt->at(xmu) + muPFNeuIso->at(xmu) + muPFPhoIso->at(xmu) - 0.5* muPFPUIso->at(xmu))/muPt->at(xmu);
-
       float IsoMu2=muPFChIso->at(ymu)/muPt->at(ymu);
       if ( (muPFNeuIso->at(ymu) + muPFPhoIso->at(ymu) - 0.5* muPFPUIso->at(ymu) )  > 0.0)
         IsoMu2= ( muPFChIso->at(ymu)/muPt->at(ymu) + muPFNeuIso->at(ymu) + muPFPhoIso->at(ymu) - 0.5* muPFPUIso->at(ymu))/muPt->at(ymu);
-
       if ( muPt->at(xmu) > 60 && muPt->at(ymu) > 15 &&  (muIDbit->at(xmu) >> 1 & 1) & (muIDbit->at(ymu) >> 1 & 1) & IsoMu1 < 0.25  && IsoMu2 < 0.25 && Z4Momentum.M() > 80 && Z4Momentum.M()< 100  && (muCharge->at(xmu) * muCharge->at(ymu) < 0))
-
         numZboson++;
     }
   }
-
   return numZboson;
-
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                                                        
-//##################################              TMass_F                ########################################################################                                                         
- 
-float LQMETClass::TMass_F(float pt3lep, float px3lep, float py3lep, float met, float metPhi) {
-  return sqrt(pow(pt3lep + met, 2) - pow(px3lep + met * cos(metPhi), 2) - pow(py3lep + met * sin(metPhi), 2));
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                                                        
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                                                        
-///////////////////////////////////               DeltaPhi             ///////////////////////////////////////////////////////////////////////////                                                        
-float LQMETClass::deltaPhi(float a, float b) {
-  float result = a - b;
-  while (result > M_PI) result -= 2 * M_PI;
-  while (result <= -M_PI) result += 2 * M_PI;
-  return fabs(result);
+int MuonClass::getNumElectron(){
+    
+    
+  //            https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2#Recommended_MVA_recipes_for_2016
+  int numElectron=0;
+  float ElectronCor=1;
+  float ElectronEffVeto=1;
+  for  (int jele=0 ; jele < nEle; jele++){
+        
+    if ( elePt->at(jele) < 15 || fabs(eleEta->at(jele)) > 2.5) continue;
+        
+    bool eleMVAIdExtra= false;
+    if (fabs (eleSCEta->at(jele)) <= 0.8 && eleMVAIsoID->at(jele) >   -0.83  ) eleMVAIdExtra= true;
+    else if (fabs (eleSCEta->at(jele)) >  0.8 &&fabs (eleSCEta->at(jele)) <=  1.5 && eleMVAIsoID->at(jele) >   -0.77  ) eleMVAIdExtra= true;
+    else if ( fabs (eleSCEta->at(jele)) >=  1.5 && eleMVAIsoID->at(jele) >  -0.69  ) eleMVAIdExtra= true;
+    else eleMVAIdExtra= false;
+        
+        
+    if (eleMVAIdExtra)
+      numElectron++;
+  }
+  return numElectron;
+    
 }
 
-Int_t LQMETClass::GetEntry(Long64_t entry)
-{
-// Read contents of entry.
-   if (!fChain) return 0;
-   return fChain->GetEntry(entry);
-}
-Long64_t LQMETClass::LoadTree(Long64_t entry)
-{
-// Set the environment to read one entry
-   if (!fChain) return -5;
-   Long64_t centry = fChain->LoadTree(entry);
-   if (centry < 0) return centry;
-   if (fChain->GetTreeNumber() != fCurrent) {
-      fCurrent = fChain->GetTreeNumber();
-      Notify();
-   }
-   return centry;
-}
 
-void LQMETClass::Init(TChain *tree)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void MuonClass::Init(TChain *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1687,7 +1868,7 @@ void LQMETClass::Init(TChain *tree)
    Notify();
 }
 
-Bool_t LQMETClass::Notify()
+Bool_t MuonClass::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -1698,18 +1879,18 @@ Bool_t LQMETClass::Notify()
    return kTRUE;
 }
 
-void LQMETClass::Show(Long64_t entry)
+void MuonClass::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t LQMETClass::Cut(Long64_t entry)
+Int_t MuonClass::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
-}*/
-//#endif // #ifdef LQMETClass_cxx
+}
+#endif // #ifdef MuonClass_cxx

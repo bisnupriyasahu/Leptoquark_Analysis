@@ -59,19 +59,23 @@ TTree *  Xttree( TFile * f_Double){
     
   //            TTree *Run_Tree = (TTree*) f_Double->Get("ggNtuplizer/EventTree");
   TTree *Run_Tree = (TTree*) f_Double->Get("phoJetNtuplizer/eventTree");
+  Run_Tree->SetMakeClass(1);
   //  std::cout<<"coming tiil here"<<std::endl;  
   cout.setf(ios::fixed, ios::floatfield);
   cout.precision(6);
   //std::cout<<"coming tiil here1"<<std::endl;  
   //########################################   General Info
   //std::cout<<"coming tiil here2"<<std::endl;  
+
+
+
   Run_Tree->SetBranchAddress("isData", &isData);
   //std::cout<<"coming tiil here2a"<<std::endl;  
-  Run_Tree->SetBranchAddress("run", &run);
 
+
+    Run_Tree->SetBranchAddress("run", &run);
   Run_Tree->SetBranchAddress("lumis", &lumis);
   Run_Tree->SetBranchAddress("event", &event);
-
   Run_Tree->SetBranchAddress("genWeight",&genWeight);
   Run_Tree->SetBranchAddress("HLTEleMuX", &HLTEleMuX);
   Run_Tree->SetBranchAddress("puTrue", &puTrue);
@@ -97,6 +101,8 @@ TTree *  Xttree( TFile * f_Double){
   Run_Tree->SetBranchAddress("tau_Phi"  ,&tau_Phi);
   Run_Tree->SetBranchAddress("tau_Mass"  ,&tau_Mass);
   Run_Tree->SetBranchAddress("tau_Charge"  ,&tau_Charge);
+
+  Run_Tree->SetBranchAddress("tau_IDbits",&tau_IDbits);
   //  Run_Tree->SetBranchAddress("taupfTausDiscriminationByDecayModeFinding", &taupfTausDiscriminationByDecayModeFinding);
   //Run_Tree->SetBranchAddress("tauByTightMuonRejection3", &tauByTightMuonRejection3);
   //Run_Tree->SetBranchAddress("tauByLooseMuonRejection3", &tauByLooseMuonRejection3);
@@ -104,11 +110,11 @@ TTree *  Xttree( TFile * f_Double){
   Run_Tree->SetBranchAddress("tauByLooseCombinedIsolationDeltaBetaCorr3Hits",&tauByLooseCombinedIsolationDeltaBetaCorr3Hits);
   Run_Tree->SetBranchAddress("tauByMediumCombinedIsolationDeltaBetaCorr3Hits",&tauByMediumCombinedIsolationDeltaBetaCorr3Hits);
   Run_Tree->SetBranchAddress("tauByMVA6LooseElectronRejection", &tauByMVA6LooseElectronRejection);
-  */Run_Tree->SetBranchAddress("tau_Dxy",&tau_Dxy);
+  *Run_Tree->SetBranchAddress("tau_Dxy",&tau_Dxy);
   Run_Tree->SetBranchAddress("tau_DecayMode",&tau_DecayMode);
   /*  Run_Tree->SetBranchAddress("tauByLooseIsolationMVArun2v1DBoldDMwLT",&tauByLooseIsolationMVArun2v1DBoldDMwLT);
   Run_Tree->SetBranchAddress("tauByVLooseIsolationMVArun2v1DBoldDMwLT",&tauByVLooseIsolationMVArun2v1DBoldDMwLT);
-  */Run_Tree->SetBranchAddress("tau_byIsolationMVArun2017v2DBoldDMwLTraw2017" ,&tau_byIsolationMVArun2017v2DBoldDMwLTraw2017);
+  /////////////////// need to give*/Run_Tree->SetBranchAddress("tau_byIsolationMVArun2017v2DBoldDMwLTraw2017" ,&tau_byIsolationMVArun2017v2DBoldDMwLTraw2017);
   //std::cout<<"coming tiil here4"<<std::endl;  
   //########################################   Mu Info
   Run_Tree->SetBranchAddress("nMu", &nMu);
@@ -171,13 +177,13 @@ TTree *  Xttree( TFile * f_Double){
   Run_Tree->SetBranchAddress("eleMVAIsoID", &eleMVAIsoID);
   Run_Tree->SetBranchAddress("eleMVAnoIsoID", &eleMVAnoIsoID);
   Run_Tree->SetBranchAddress("eledEtaseedAtVtx", &eledEtaseedAtVtx);
-  /*  Run_Tree->SetBranchAddress("eleE1x5", &eleE1x5);
+  /*Run_Tree->SetBranchAddress("eleE1x5", &eleE1x5);
   Run_Tree->SetBranchAddress("eleE2x5", &eleE2x5);
   Run_Tree->SetBranchAddress("eleE5x5", &eleE5x5);
   Run_Tree->SetBranchAddress("eleE1x5Full5x5", &eleE1x5Full5x5);
   Run_Tree->SetBranchAddress("eleE2x5Full5x5", &eleE2x5Full5x5);
   Run_Tree->SetBranchAddress("eleE5x5Full5x5", &eleE5x5Full5x5);
-  */Run_Tree->SetBranchAddress("eleR9Full5x5", &eleR9Full5x5);
+  ///////////////////////////needtogive */Run_Tree->SetBranchAddress("eleR9Full5x5", &eleR9Full5x5);
   /*Run_Tree->SetBranchAddress("eleEcalDrivenSeed", &eleEcalDrivenSeed);
   Run_Tree->SetBranchAddress("eleDr03EcalRecHitSumEt", &eleDr03EcalRecHitSumEt);
   Run_Tree->SetBranchAddress("eleDr03HcalDepth1TowerSumEt", &eleDr03HcalDepth1TowerSumEt);
@@ -188,10 +194,10 @@ TTree *  Xttree( TFile * f_Double){
   Run_Tree->SetBranchAddress("eleTrkdxy", &eleTrkdxy);
   Run_Tree->SetBranchAddress("eleKFHits", &eleKFHits);
   Run_Tree->SetBranchAddress("eleKFChi2", &eleKFChi2);
-  */ Run_Tree->SetBranchAddress("eleIDbit", &eleIDbit);
+  ///////////////////////needto*/Run_Tree->SetBranchAddress("eleIDbit", &eleIDbit);
     
   //########################################   Jet Info
-  Run_Tree->SetBranchAddress("nJet",&nJet);
+    Run_Tree->SetBranchAddress("nJet",&nJet);
   Run_Tree->SetBranchAddress("jetPt",&jetPt);
   Run_Tree->SetBranchAddress("jetEta",&jetEta);
   Run_Tree->SetBranchAddress("jetPhi",&jetPhi);
@@ -229,8 +235,8 @@ TTree *  Xttree( TFile * f_Double){
   Run_Tree->SetBranchAddress("pdfSystWeight",&pdfSystWeight);
   //  Run_Tree->SetBranchAddress("pdfSystWeight",&pdfSystWeightId);
   Run_Tree->SetBranchAddress("pdfWeight",&pdfWeight);
-    
-    
+      
+  
   return Run_Tree;
 }
 
@@ -243,11 +249,11 @@ TTree *  Xttree( TFile * f_Double){
 
 TH1F *  HistPUData(){
   //std::cout<<"endPUDAta-----------------------------------------------------------------------"<<std::endl;
-  TFile * PUData= TFile::Open("rootfile/pileup_hists/Data_nPU_new.root");
+  TFile * PUData= TFile::Open("Data_nPU_new.root");
   TH1F * HistoPUData= (TH1F *) PUData->Get("pileup");
   HistoPUData->Rebin(2);
   HistoPUData->Scale(1.0/HistoPUData->Integral());
-  cout << "HistoPUData integral= "<<HistoPUData->Integral()<<"\n";
+  // cout << "HistoPUData integral= "<<HistoPUData->Integral()<<"\n";
   return HistoPUData;
 }
 
@@ -280,7 +286,7 @@ TH1F *  HistPUMC(bool isData,TFile *f_Double){
 
 TH2F**  FuncHistMuId(){
   //  std::cout<<"MU ID -----------------------------------------------------------------------"<<std::endl;                                                                                                   
-  TFile * MuCorrId_BCDEF= TFile::Open(("rootfile/pileup_hists/RunABCD_SF_ID.root"));
+  TFile * MuCorrId_BCDEF= TFile::Open(("RunABCD_SF_ID.root"));
   //  TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("NUM_TightID_DEN_genTracks_pt_abseta");
   TH2F * HistoMuId_BCDEF= (TH2F *) MuCorrId_BCDEF->Get("NUM_TightID_DEN_TrackerMuons_pt_abseta");
   static TH2F* HistoMuId[1]={HistoMuId_BCDEF};
@@ -290,7 +296,7 @@ TH2F**  FuncHistMuId(){
 TH2F** FuncHistMuIso(){
 
   //  std::cout<<"MU Iso -----------------------------------------------------------------------"<<std::endl;                                                                                                   
-  TFile * MuCorrIso_BCDEF= TFile::Open(("rootfile/pileup_hists/RunABCD_SF_ISO.root"));
+  TFile * MuCorrIso_BCDEF= TFile::Open(("RunABCD_SF_ISO.root"));
   //TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
   //  TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("MC_NUM_TightRelIso_DEN_TightID_PAR_pt_alleta_bin1");
   TH2F * HistoMuIso_BCDEF= (TH2F *) MuCorrIso_BCDEF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
@@ -300,7 +306,7 @@ TH2F** FuncHistMuIso(){
 
 TH2F** FuncHistMuTrigger(){
   //  std::cout<<"Trigger -----------------------------------------------------------------------"<<std::endl;                                                                                                  
-  TFile * MuCorrTrg_BCDEF= TFile::Open(("rootfile/pileup_hists/EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root"));
+  TFile * MuCorrTrg_BCDEF= TFile::Open(("EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root"));
   //TH1F * HistoMuTrg_BCDEF= (TH1F *) MuCorrTrg_BCDEF->Get("Mu50_EtaBins/eta_ratio");
   TH2F * HistoMuTrg_BCDEF= (TH2F *) MuCorrTrg_BCDEF->Get("Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio");
   static TH2F* HistoMuTrg[2]={HistoMuTrg_BCDEF};
@@ -309,16 +315,16 @@ TH2F** FuncHistMuTrigger(){
 
 
 TGraphAsymmErrors* FuncHistMuTrack(){
-  std::cout<<"track -----------------------------------------------------------------------"<<std::endl;                                                                                                   
-  TFile * MuCorrTrack= TFile::Open(("rootfile/pileup_hists/Tracking_EfficienciesAndSF_BCDEFGH.root"));
+  //std::cout<<"track -----------------------------------------------------------------------"<<std::endl;                                                                                                   
+  TFile * MuCorrTrack= TFile::Open(("Tracking_EfficienciesAndSF_BCDEFGH.root"));
   TGraphAsymmErrors * HistoMuTrack= (TGraphAsymmErrors *) MuCorrTrack->Get("ratio_eff_eta3_dr030e030_corr");
   return HistoMuTrack;
 }
 
 
 TH2F * FuncHistEleMVAId(std::string type){
-  //      TFile * EleCorrMVAIdIso90= TFile::Open(("rootfile/pileup_hists/egammaEffi.txt_EGM2D.root")); //This is for 2016
-  TFile * EleCorrMVAIdIso90= TFile::Open(("rootfile/pileup_hists/2018_ElectronMVA90.root")); //This is for 2018
+  //      TFile * EleCorrMVAIdIso90= TFile::Open(("/egammaEffi.txt_EGM2D.root")); //This is for 2016
+  TFile * EleCorrMVAIdIso90= TFile::Open(("2018_ElectronMVA90.root")); //This is for 2018
   // TFile * EleCorrMVAIdIso90= TFile::Open(("../interface/pileup-hists/gammaEffi.txt_EGM2D_runBCDEF_passingMVA94Xwp90iso.root"));
   TH2F * HistoEleMVAIdIso90= (TH2F *) EleCorrMVAIdIso90->Get("EGamma_SF2D");
   TH2F * HistoEleMVAIdIso90_EffMC= (TH2F *) EleCorrMVAIdIso90->Get("EGamma_EffMC2D");
@@ -352,7 +358,8 @@ int getNumTau(){
     if (tau_Pt->at(itau) < 20  || fabs(tau_Eta->at(itau)) > 2.3 ) continue;
         
     //bool TauIdIso =  taupfTausDiscriminationByDecayModeFinding->at(itau) > 0.5 && tauByLooseMuonRejection3->at(itau) > 0 && tauByMVA6LooseElectronRejection->at(itau) > 0 && tauByLooseIsolationMVArun2v1DBoldDMwLT->at(itau) > 0;
-    bool TauIdIso =  0;//taupfTausDiscriminationByDecayModeFinding->at(itau) > 0.5 && tauByLooseMuonRejection3->at(itau) > 0 && tauByMVA6LooseElectronRejection->at(itau) > 0 && tauByLooseIsolationMVArun2v1DBoldDMwLT->at(itau) > 0;
+   
+      bool TauIdIso = ((*tau_IDbits)[itau]>>0&1 == 1 && ((*tau_IDbits)[itau]>>2&1 == 1)> 0 && ((*tau_IDbits)[itau]>>5&1 == 1) > 0 && ((*tau_IDbits)[itau]>>14&1 == 1) > 0);
     if (!TauIdIso) continue;
     numTau++;
   }
@@ -529,7 +536,7 @@ std::vector<float> GeneratorInfo(){
 //########################################
 
 TH2F **  FuncHistBTagSF(){
-  TFile * TTEff= TFile::Open(("rootfile/BTagSF/TTJets.root"));
+  TFile * TTEff= TFile::Open(("TTJets.root"));
   TH2F * TTSF0_btagged= (TH2F *) TTEff->Get("BSF_FLV0_Btagged");
   TH2F * TTSF0_total= (TH2F *) TTEff->Get("BSF_FLV0_Total");
   TH2F * TTSF5_btagged= (TH2F *) TTEff->Get("BSF_FLV5_Btagged");
@@ -553,36 +560,36 @@ TH2F **  FuncHistBTagSF(){
 // W and DY K-factor files  (FIT-based K-factor)
 //########################################
 
-TFile * kfactorW=TFile::Open("rootfile/kfactor_W.root");
+TFile * kfactorW=TFile::Open("kfactor_W.root");
 TH1F* HistkfactorW= (TH1F*) kfactorW->Get("KFcator");
 float kf_W_1=HistkfactorW->GetBinContent(1);
 float kf_W_2=HistkfactorW->GetBinContent(2);
 
 
-TFile * kfactorWUp=TFile::Open("rootfile/kfactor_monoJet_WUp.root");
+TFile * kfactorWUp=TFile::Open("kfactor_monoJet_WUp.root");
 TH1F* HistkfactorWUp= (TH1F*) kfactorWUp->Get("KFcator");
 float kf_W_1Up=HistkfactorWUp->GetBinContent(1);
 float kf_W_2Up=HistkfactorWUp->GetBinContent(2);
 
-TFile * kfactorWDown=TFile::Open("rootfile/kfactor_monoJet_WDown.root");
+TFile * kfactorWDown=TFile::Open("kfactor_monoJet_WDown.root");
 TH1F* HistkfactorWDown= (TH1F*) kfactorWDown->Get("KFcator");
 float kf_W_1Down=HistkfactorWDown->GetBinContent(1);
 float kf_W_2Down=HistkfactorWDown->GetBinContent(2);
 
 
 
-TFile * kfactorZ=TFile::Open("rootfile/kfactor_Z.root");
+TFile * kfactorZ=TFile::Open("kfactor_Z.root");
 TH1F* HistkfactorZ= (TH1F*) kfactorZ->Get("KFcator");
 float kf_Z_1=HistkfactorZ->GetBinContent(1);
 float kf_Z_2=HistkfactorZ->GetBinContent(2);
 
 
-TFile * kfactorZUp=TFile::Open("rootfile/kfactor_monoJet_ZUp.root");
+TFile * kfactorZUp=TFile::Open("kfactor_monoJet_ZUp.root");
 TH1F* HistkfactorZUp= (TH1F*) kfactorZUp->Get("KFcator");
 float kf_Z_1Up=HistkfactorZUp->GetBinContent(1);
 float kf_Z_2Up=HistkfactorZUp->GetBinContent(2);
 
-TFile * kfactorZDown=TFile::Open("rootfile/kfactor_monoJet_ZDown.root");
+TFile * kfactorZDown=TFile::Open("kfactor_monoJet_ZDown.root");
 TH1F* HistkfactorZDown= (TH1F*) kfactorZDown->Get("KFcator");
 float kf_Z_1Down=HistkfactorZDown->GetBinContent(1);
 float kf_Z_2Down=HistkfactorZDown->GetBinContent(2);

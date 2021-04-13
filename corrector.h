@@ -138,7 +138,7 @@ float Cor94X_IDIso_Ele(float pt, float eta,  TH2F * HistoEleSF){
   if (eta >= 2 && eta < 2.5 ) etaBIN=10;
     
 
-  std::cout<<"coming inside Cor94X_IDIso_Ele() "<<std::endl;      
+  //std::cout<<"coming inside Cor94X_IDIso_Ele() "<<std::endl;      
   //    float SF_0p5= HistoEleSF0p5->GetBinContent(etaBIN, ptBIN);
   //    float SF_5= HistoEleSF5->GetBinContent(etaBIN, ptBIN);
   //    float FinalSF= 0.05 * SF_0p5  + 0.95 * SF_5;   //approximation of 10/fb data
@@ -164,7 +164,7 @@ float getCorrFactorMuon94X(bool isData, float pt, float eta, TH2F ** HistoId, TH
     float Tracking_SF=Cor94X_TRK_Mu_Full2016(eta, graph);
                              
     return (Weighted_IDSF * Weighted_IsoSF * Tracking_SF * Weighted_TriggerSF);
-    std::cout<<"coming inside  getCorrFactorMuon94X  "<<std::endl;     
+    // std::cout<<"coming inside  getCorrFactorMuon94X  "<<std::endl;     
  }
     
 }
@@ -187,7 +187,7 @@ float GetBJetSF(bool isData, float x, float jetEta, float jetHadFlvr){
     }
     else
       return 1;
-  std::cout<<"coming inside GetBJetSF "<<std::endl;    
+    //  std::cout<<"coming inside GetBJetSF "<<std::endl;    
   }
 }
 

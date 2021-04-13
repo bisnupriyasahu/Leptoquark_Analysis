@@ -7,9 +7,9 @@
 
 int main(int argc, const char* argv[])
 {
-  
+
   auto numOf_c_quark=0;
-  auto numOf_s_quark=0;
+  auto numOf_s_quark=0;  
   
   std::string out = *(argv + 1);
   
@@ -20,16 +20,15 @@ int main(int argc, const char* argv[])
   myMap2 = new map<string, TH2F*>();
   
   std::vector<string> input;
-  for (int f = 2; f < argc; f++) {
+  for (int f = 3; f < argc; f++) {
     input.push_back(*(argv + f));
     
-    cout <<"INPUT NAME IS:   " << input[f - 2] << "\n";
+    //    cout <<"INPUT NAME IS:   " << input[f - 3] << "\n";
   }
   
   
   
-  
-  
+    
   //########################################
   // Muon Id, Iso, Trigger and Tracker Eff files
   //########################################
@@ -49,14 +48,15 @@ int main(int argc, const char* argv[])
   //########################################
   // W and DY K-factor files  (Bin-based K-factor)
   //########################################
-  //std::string ROOTLocHT= "/Users/abdollah1/GIT_abdollah110/DM2018/ROOT94X/2017/";
-  /*vector<float> W_HTBinROOTFiles = W_HTBin(ROOTLocHT);
-  vector<float> WMuNu_MassBinROOTFiles = WMuNu_MassBin(ROOTLocHT);
-  vector<float> WTauNu_MassBinROOTFiles = WTauNu_MassBin(ROOTLocHT);
+  std::string ROOTLocHT= "/nfs_scratch/bsahu/LQ_Analysis/CMSSW_10_2_18/src/MuonAnalyzer/Muon_Analyzer/test/";
+  //   vector<float> W_HTBinROOTFiles = W_HTBin(ROOTLocHT);
+  //  std::cout<<"COMING AFTER WJETS"<<std::endl;
+  // vector<float> WMuNu_MassBinROOTFiles = WMuNu_MassBin(ROOTLocHT);
+  // vector<float> WTauNu_MassBinROOTFiles = WTauNu_MassBin(ROOTLocHT);
   
-  */
   
-  TFile * MassDepKFactor=TFile::Open("rootfile/k_fakNNLO_use.root");
+  
+  TFile * MassDepKFactor=TFile::Open("k_fakNNLO_use.root");
   TH1F* HistMassDepKFactor= (TH1F*) MassDepKFactor->Get("k_fak_mean");
     
   //########################################
@@ -76,21 +76,13 @@ int main(int argc, const char* argv[])
   for (int k = 0; k < input.size(); k++) {
     
     TFile *f_Double = TFile::Open(input[k].c_str());
-    /* if(f_Double->IsZombie()) {
-       cout<<"removing the Zombie file"<<f_Double<< "\n";
-       delete f_Double;
-       } */     
     
-
-    
-    
-    
-    cout << "\n  Now is running on ------->   " << std::string(f_Double->GetName()) << "\n";
+    //    cout << "\n  Now is running on ------->   " << std::string(f_Double->GetName()) << "\n";
     
     std::string InputROOT= std::string(f_Double->GetName());
     TFile * myFile = TFile::Open(f_Double->GetName());
     TH1F * HistoTot = (TH1F*) myFile->Get("hcount");
-    
+    //std::cout<<"HistoTot entries  "<<HistoTot->GetEntries()<<std::endl;
     TTree *  Run_Tree;
     //    std::cout<<"coming tiil here"<<std::endl;        
     Run_Tree= Xttree(f_Double);
@@ -99,7 +91,7 @@ int main(int argc, const char* argv[])
     //########################################
     // Pileup files
     //########################################
-    
+  
     TH1F *  HistoPUData =HistPUData();
     // Need a fix for PU distribution
     
@@ -115,10 +107,10 @@ int main(int argc, const char* argv[])
     //                           Loop over Events in each ROOT files
     //#####################################################################
     //#####################################################################
-    Int_t nentries_wtn = (Int_t) Run_Tree->GetEntries();
-    cout<<"nentries_wtn===="<<nentries_wtn<<"\n";
+    Int_t nentries_wtn = (Int_t) Run_Tree->GetEntriesFast();
+    //   cout<<"nentries_wtn===="<<nentries_wtn<<"\n";
     
-    for (Int_t i = 0; i < nentries_wtn; i++) {
+       for (Int_t i = 0; i < nentries_wtn; i++) {
       //                    for (Int_t i = 0; i < 10000; i++) {
       auto thereisSquark= false;
       Run_Tree->GetEntry(i);
@@ -131,7 +123,7 @@ int main(int argc, const char* argv[])
 	if (fabs(mcPID->at(ij))==4  && mcStatus->at(ij)==23 ) numOf_c_quark++;
 	//                            cout <<" pdgid is "<< mcPID->at(ij)<<"\n";
       }
-      if (thereisSquark) continue;
+       if (thereisSquark) continue;
       
       //      auto Squark= false;                                         
       float jetES[3]={-1,0,1};
@@ -139,11 +131,11 @@ int main(int argc, const char* argv[])
       std::string ScaleJet_Cat[3] = {"JetESDown", "", "JetESUp"};
       std::string ScaleMETUE_Cat[5] = {"METUESDown", "", "METUESUp","METJESDown","METJESUp"};
       
-
+      
       
       
       //      std::cout<<"coming here 1b"<<std::endl;
-      //if (Squark) continue;                                                                                                                                                                            
+      if (thereisSquark) continue;
       
       
       //###############################################################################################                                                                                                   
@@ -283,7 +275,7 @@ int main(int argc, const char* argv[])
       //###############################################################################################
       //  Some Histogram Filling
       //###############################################################################################
-      plotFill("_WeightLumi",LumiWeight,10000,0,1000);
+       plotFill("_WeightLumi",LumiWeight,10000,0,1000);
       plotFill("_WeightGen",GetGenWeight,10000,0,1000);
       plotFill("_WeightPU",PUWeight,10000,0,1000);
       plotFill("_WeightTopPtReweighting",TopPtReweighting,100,0,2);
@@ -296,12 +288,11 @@ int main(int argc, const char* argv[])
       plotFill("_nVtx_PUCorr",nVtx,60,0,60,PUWeight);
       plotFill("_WBosonPt",WBosonPt,150,0,1500,PUWeight);
       plotFill("_FinalBTagSF", FinalBTagSF,200,0,2);
-      //      std::cout<<"coming numzboson "<<std::endl;
+       //      std::cout<<"coming numzboson "<<std::endl;
       for (int qq=0; qq < 60;qq++){
 	if ((HLTEleMuX >> qq & 1) == 1)
 	  plotFill("_HLT",qq,60,0,60);
-      }
-            
+      }            
       //      std::cout<<"coming before loop of neve "<<std::endl;
 
 
@@ -426,7 +417,7 @@ int main(int argc, const char* argv[])
 	  //###############################################################################################	
  
 	  std::string CHL="MuJet";
-                    
+	        
 	  plotFill("NumTau", numTau,10,0,10);
 	  plotFill("NumElectron", numElectron,10,0,10);
 	  plotFill("NumZboson", numZboson,10,0,10);
@@ -436,7 +427,7 @@ int main(int argc, const char* argv[])
 	  plotFill("TotalWeight_Mu",TotalWeight[0]*MuonCor,10000,0,1000);
 	  plotFill("TotalNonLumiWeight_Mu",TotalWeight[0]*MuonCor/LumiWeight,10000,0,1000);	   
 
-	  for (int iso = 0; iso < size_isoCat; iso++) {
+	   for (int iso = 0; iso < size_isoCat; iso++) {
 	    if (Iso_category[iso]) {
 	      for (int imt = 0; imt < size_mTCat; imt++) {
 		if (MT_category[imt]) {
@@ -455,43 +446,43 @@ int main(int argc, const char* argv[])
 			    if (!( std::find(HistNamesFilled.begin(), HistNamesFilled.end(), FullStringName) != HistNamesFilled.end())){
 			      HistNamesFilled.push_back(FullStringName);
                                                             
-			      if (1){
+			       if (1){
 				//##################
-                                                                
-                                                                
+			                                        
+			                                 
                                                                 
 				plotFill(CHL+"_LQMass"+FullStringName,LQ4Momentum.M(),200,0,2000,FullWeight);
-				//                                                                plotFill(CHL+"_LepPt"+FullStringName,muPt->at(imu),2000,0,2000,FullWeight);
-				//                                                                
-				//                                                                plotFill(CHL+"_tmass_MuMet"+FullStringName,tmass_MuMet,200,0,2000,FullWeight);
-				//                                                                plotFill(CHL+"_MET"+FullStringName,pfMET,200,0,2000,FullWeight);
-				//                                                                plotFill(CHL+"_METPhi"+FullStringName,pfMETPhi,400,-4,4,FullWeight);
-				//                                                                plotFill(CHL+"_JetPt"+FullStringName,jetPt->at(ijet) ,2000,0,2000,FullWeight);
-				//                                                                plotFill(CHL+"_JetEta"+FullStringName,jetEta->at(ijet),120,-3,3,FullWeight);
-				//                                                                
-				//                                                                plotFill(CHL+"_LepEta"+FullStringName,muEta->at(imu),100,-2.5,2.5,FullWeight);
-				//                                                                plotFill(CHL+"_tmass_LQMet"+FullStringName,tmass_LQMet,200,0,2000,FullWeight);
-				//                                                                
-				//                                                                plotFill(CHL+"_dPhi_Jet_Met"+FullStringName,deltaPhi(Jet4Momentum.Phi(),pfMETPhi),160,0,3.2,FullWeight);
-				//                                                                plotFill(CHL+"_dPhi_Mu_Met"+FullStringName,deltaPhi(Mu4Momentum.Phi(),pfMETPhi),160,0,3.2,FullWeight);
-				//                                                                plotFill(CHL+"_dPhi_Mu_Jet"+FullStringName,deltaPhi(Mu4Momentum.Phi(),Jet4Momentum.Phi()),160,0,3.2,FullWeight);
-				//                                                                plotFill(CHL+"_NumJet"+FullStringName,numJet,10,0,10,FullWeight);
-				//                                                                plotFill(CHL+"_NumBJet"+FullStringName,numBJet,10,0,10,FullWeight);
-				//                                                                plotFill(CHL+"_WBosonMass"+FullStringName,WBosonMass,200,0,2000,FullWeight);
-				//                                                                plotFill(CHL+"_genHT"+FullStringName,genHT,200,0,2000,FullWeight);
-				//                                                                plotFill(CHL+"_recoHT"+FullStringName,recoHT,300,0,3000,FullWeight);
-				//                                                                plotFill(CHL+"_ST"+FullStringName,recoHT+muPt->at(imu),300,0,3000,FullWeight);
-				//                                                                plotFill(CHL+"_dR_Mu_Jet"+FullStringName,Jet4Momentum.DeltaR(Mu4Momentum),500,0,5,FullWeight);
-				//                                                                plotFill(CHL+"_LepPhi"+FullStringName,muPhi->at(imu),400,-4,4,FullWeight);
-				//                                                                plotFill("_FinalBTagSF"+FullStringName, FinalBTagSF,200,0,2);
-				//                                                                
-				//                                                                plotFill(CHL+"_nVtx"+FullStringName,nVtx,100,0,100,FullWeight);
-				//                                                                if (PUWeight!=0)   plotFill(CHL+"_nVtx_NoPU"+FullStringName,nVtx,100,0,100,FullWeight/ PUWeight);
-				//                                                                plotFill("_FinalBTagSF"+FullStringName, FinalBTagSF,200,0,2);
+				plotFill(CHL+"_LepPt"+FullStringName,muPt->at(imu),2000,0,2000,FullWeight);
+				
+				plotFill(CHL+"_tmass_MuMet"+FullStringName,tmass_MuMet,200,0,2000,FullWeight);
+				plotFill(CHL+"_MET"+FullStringName,pfMET,200,0,2000,FullWeight);
+				plotFill(CHL+"_METPhi"+FullStringName,pfMETPhi,400,-4,4,FullWeight);
+				plotFill(CHL+"_JetPt"+FullStringName,jetPt->at(ijet) ,2000,0,2000,FullWeight);
+				plotFill(CHL+"_JetEta"+FullStringName,jetEta->at(ijet),120,-3,3,FullWeight);
+				
+				plotFill(CHL+"_LepEta"+FullStringName,muEta->at(imu),100,-2.5,2.5,FullWeight);
+				plotFill(CHL+"_tmass_LQMet"+FullStringName,tmass_LQMet,200,0,2000,FullWeight);
+				
+				plotFill(CHL+"_dPhi_Jet_Met"+FullStringName,deltaPhi(Jet4Momentum.Phi(),pfMETPhi),160,0,3.2,FullWeight);
+				plotFill(CHL+"_dPhi_Mu_Met"+FullStringName,deltaPhi(Mu4Momentum.Phi(),pfMETPhi),160,0,3.2,FullWeight);
+				plotFill(CHL+"_dPhi_Mu_Jet"+FullStringName,deltaPhi(Mu4Momentum.Phi(),Jet4Momentum.Phi()),160,0,3.2,FullWeight);
+				plotFill(CHL+"_NumJet"+FullStringName,numJet,10,0,10,FullWeight);
+				plotFill(CHL+"_NumBJet"+FullStringName,numBJet,10,0,10,FullWeight);
+				plotFill(CHL+"_WBosonMass"+FullStringName,WBosonMass,200,0,2000,FullWeight);
+				plotFill(CHL+"_genHT"+FullStringName,genHT,200,0,2000,FullWeight);
+				plotFill(CHL+"_recoHT"+FullStringName,recoHT,300,0,3000,FullWeight);
+				plotFill(CHL+"_ST"+FullStringName,recoHT+muPt->at(imu),300,0,3000,FullWeight);
+				plotFill(CHL+"_dR_Mu_Jet"+FullStringName,Jet4Momentum.DeltaR(Mu4Momentum),500,0,5,FullWeight);
+				plotFill(CHL+"_LepPhi"+FullStringName,muPhi->at(imu),400,-4,4,FullWeight);
+				plotFill("_FinalBTagSF"+FullStringName, FinalBTagSF,200,0,2);
+				
+				plotFill(CHL+"_nVtx"+FullStringName,nVtx,100,0,100,FullWeight);
+				if (PUWeight!=0)   plotFill(CHL+"_nVtx_NoPU"+FullStringName,nVtx,100,0,100,FullWeight/ PUWeight);
+				plotFill("_FinalBTagSF"+FullStringName, FinalBTagSF,200,0,2);
                                                                 
-                                                                
-                                                                
-			      }
+				
+				
+			       }
 			    }
 			  }
 			}
@@ -501,27 +492,28 @@ int main(int argc, const char* argv[])
 		}
 	      }
 	    }
-	  }
+	 }
 	  
 	  //###############################################################################################
 	  //  Doing EleTau Analysis
 	  //###############################################################################################
                     
+	  
 
-
-	}//for jet loop in jet4momentum                                                                                                                                                             
+	  	}//for jet loop in jet4momentum                                                                                                                                                             
 	
       }//for loop imu                                                                                                                                                                                     
       
-    }//nentry                                                                                                                                                                                             
+       }//nentry                                                                                                                                                                                             
     
     //if((nentriesToCheck-1)%reportEvery != 0)
     //std::cout<<"Finished entry "<<(nentriesToCheck-1)<<"/"<<(nentriesToCheck-1)<<std::endl;
     //sw.Stop();
     //  fileName = new TFile(file2, "RECREATE");
-    
+     
   }
-  fout->cd();
+   
+fout->cd();
   
   map<string, TH1F*>::const_iterator iMap1 = myMap1->begin();
   map<string, TH1F*>::const_iterator jMap1 = myMap1->end();
@@ -537,4 +529,4 @@ int main(int argc, const char* argv[])
     
   fout->Close();
   cout<< "numOf_c_quark " << numOf_c_quark << "  numOf_s_quark " << numOf_s_quark<<"\n";
-}//mainfunction
+  }//mainfunction
