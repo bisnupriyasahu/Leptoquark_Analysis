@@ -426,7 +426,7 @@ int numBJets( float BJetPtCut, float CSVCut){
   int numBJet=0;
   for (int ijet= 0 ; ijet < nJet ; ijet++){
     // std::cout<<"comin inside numbjet for loop"<<std::endl;
-    if((jetID->at(ijet)>>0&1) == 1 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && jetCSV2BJetTags->at(ijet) >  CSVCut)
+    if(((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && jetCSV2BJetTags->at(ijet) >  CSVCut)
       numBJet++;
     //    std::cout<<"comin inside numbjet for loop"<<std::endl;
 }
@@ -438,7 +438,7 @@ int numBJets( float BJetPtCut, float CSVCut){
 int numJets( float SimpleJetPtCut){
   int numJet=0;
   for (int ijet= 0 ; ijet < nJet ; ijet++){
-    if ((jetID->at(ijet)>>0&1) == 1 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
+    if (((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
       numJet++;
   }
   return numJet;
@@ -686,7 +686,7 @@ float FuncFinalBTagSF(bool isData, TH2F ** Btagg_TT, float BJetPtCut, float CSVC
         
     float HadronFlavor= isData ? 1 : jetHadFlvr->at(ijet);
         
-    if (/*jetPFLooseId->at(ijet) > 0.5 &&*/ jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 ){
+    if (((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 ){
             
             
       if ( jetCSV2BJetTags->at(ijet) >  CSVCut ){

@@ -85,6 +85,11 @@ public :
    float eleMass= 0.000511;
    TH1F * HistPUData();
    float getBtagEfficiency(bool isData, bool passCSV, float pt, float eta, TH2F ** Btagg_TT);
+   float TMass_F(float pt3lep, float px3lep, float py3lep, float met, float metPhi);
+   float deltaPhi(float a, float b);
+
+   float getElectronCor(TH2F * HistoEleMVAIdIso90);
+   TH2F * FuncHistEleMVAId(std::string type);
    //  float LeptonPtCut_=60;  
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
@@ -830,6 +835,19 @@ Long64_t MuonClass::LoadTree(Long64_t entry)
    return centry;
 }
 
+float MuonClass::deltaPhi(float a, float b) {
+  float result = a - b;
+  while (result > M_PI) result -= 2 * M_PI;
+  while (result <= -M_PI) result += 2 * M_PI;
+  return fabs(result);
+}
+
+float MuonClass::TMass_F(float pt3lep, float px3lep, float py3lep, float met, float metPhi) {
+  return sqrt(pow(pt3lep + met, 2) - pow(px3lep + met * cos(metPhi), 2) - pow(py3lep + met * sin(metPhi), 2));
+}
+
+
+
 TH2F** MuonClass::FuncHistMuId()
 {
   //  std::cout<<"MU ID -----------------------------------------------------------------------"<<std::endl;
@@ -1059,6 +1077,53 @@ float MuonClass::FuncBosonKFactor(std::string X){
 }
 
 
+float MuonClass::getElectronCor(TH2F * HistoEleMVAIdIso90){
+    
+  float ElectronCor=1;
+  for  (int jele=0 ; jele < nEle; jele++){
+        
+    if ( elePt->at(jele) < 15 || fabs(eleEta->at(jele)) > 2.5) continue;
+        
+    bool eleMVAIdExtra= false;
+    if (fabs (eleSCEta->at(jele)) <= 0.8 && eleMVAIsoID->at(jele) >   -0.83  ) eleMVAIdExtra= true;
+    else if (fabs (eleSCEta->at(jele)) >  0.8 &&fabs (eleSCEta->at(jele)) <=  1.5 && eleMVAIsoID->at(jele) >   -0.77  ) eleMVAIdExtra= true;
+    else if ( fabs (eleSCEta->at(jele)) >=  1.5 && eleMVAIsoID->at(jele) >  -0.69  ) eleMVAIdExtra= true;
+    else eleMVAIdExtra= false;
+        
+        
+        
+    //        if (!(eleMVAIdExtra )) {
+    //            ElectronEffVeto= ElectronEffVeto * getEffVetoMVA90WPElectron80X(isData,  elePt->at(jele),eleSCEta->at(jele),    HistoEleMVAIdIso90 , HistoEleMVAIdIso90_EffMC,HistoEleMVAIdIso90_EffData);
+    //            continue;
+    //        }
+        
+    if (eleMVAIdExtra)
+      ElectronCor=getCorrFactorMVA90WPElectron94X(isData,  elePt->at(jele),eleSCEta->at(jele),    HistoEleMVAIdIso90 );
+        
+    break;
+  }
+  return ElectronCor;
+}
+
+
+TH2F * MuonClass::FuncHistEleMVAId(std::string type){
+  //      TFile * EleCorrMVAIdIso90= TFile::Open(("/egammaEffi.txt_EGM2D.root")); //This is for 2016
+  TFile * EleCorrMVAIdIso90= TFile::Open(("2018_ElectronMVA90.root")); //This is for 2018
+  // TFile * EleCorrMVAIdIso90= TFile::Open(("../interface/pileup-hists/gammaEffi.txt_EGM2D_runBCDEF_passingMVA94Xwp90iso.root"));
+  TH2F * HistoEleMVAIdIso90= (TH2F *) EleCorrMVAIdIso90->Get("EGamma_SF2D");
+  TH2F * HistoEleMVAIdIso90_EffMC= (TH2F *) EleCorrMVAIdIso90->Get("EGamma_EffMC2D");
+  TH2F * HistoEleMVAIdIso90_EffData= (TH2F *) EleCorrMVAIdIso90->Get("EGamma_EffData2D");
+  
+  if (type.find("Tot") != string::npos)
+    return HistoEleMVAIdIso90;
+  else if (type.find("MC") != string::npos)
+    return HistoEleMVAIdIso90_EffMC;
+  else if (type.find("Data") != string::npos)
+    return HistoEleMVAIdIso90_EffData;
+  else
+    return 0;
+    
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////                              
 ////////////////////////////////////////////         Number functonf for Jets,BJets,ZBoson            //////////////////////////////////////////////////////////////////////                              
 //###########      num Tau   ########################################################### 
