@@ -10,7 +10,8 @@ int main(int argc, const char* argv[])
 
   auto numOf_c_quark=0;
   auto numOf_s_quark=0;  
-  
+  TH1F *_MuPt;
+  _MuPt = new TH1F("_MuPt","",100,0,200);  
   std::string out = *(argv + 1);
   
   cout << "\n\n\n OUTPUT NAME IS:    " << out << endl;     //PRINTING THE OUTPUT name
@@ -42,8 +43,8 @@ int main(int argc, const char* argv[])
   TH2F * HistoEleMVAIdIso90= FuncHistEleMVAId("Tot");
   TH2F * HistoEleMVAIdIso90_EffMC= FuncHistEleMVAId("MC");
   TH2F * HistoEleMVAIdIso90_EffData= FuncHistEleMVAId("Data");
-  
-
+ 
+ 
 
   //########################################
   // W and DY K-factor files  (Bin-based K-factor)
@@ -100,7 +101,7 @@ int main(int argc, const char* argv[])
     size_t isDataXXX = InputROOT.find("Data");
     bool check_data=0;
     if (isDataXXX!= string::npos)  check_data=1;
-    //TH1F * HistoPUMC=HistPUMC(check_data,f_Double);
+    //    TH1F * HistoPUMC=HistPUMC(check_data,f_Double);
     
     //#####################################################################
     //#####################################################################
@@ -125,19 +126,7 @@ int main(int argc, const char* argv[])
       }
        if (thereisSquark) continue;
       
-      //      auto Squark= false;                                         
-      float jetES[3]={-1,0,1};
-      std::string ResolJet_Cat[3] = {"JetERDown", "", "JetERUp"};
-      std::string ScaleJet_Cat[3] = {"JetESDown", "", "JetESUp"};
-      std::string ScaleMETUE_Cat[5] = {"METUESDown", "", "METUESUp","METJESDown","METJESUp"};
-      
-      
-      
-      
-      //      std::cout<<"coming here 1b"<<std::endl;
-      if (thereisSquark) continue;
-      
-      
+       
       //###############################################################################################                                                                                                   
       //  MET Filters (only on Data)                                                                                                                                                                      
       //###############################################################################################
@@ -272,6 +261,7 @@ int main(int argc, const char* argv[])
       int numZboson = getNumZBoson();
 
 
+
       //###############################################################################################
       //  Some Histogram Filling
       //###############################################################################################
@@ -293,9 +283,9 @@ int main(int argc, const char* argv[])
 	if ((HLTEleMuX >> qq & 1) == 1)
 	  plotFill("_HLT",qq,60,0,60);
       }            
-      //      std::cout<<"coming before loop of neve "<<std::endl;
+      //      std::cout<<"coming before loop  of neve "<<std::endl;
 
-
+     
 
       //############################################################################################                                                                                                      
       //###########       Loop over MuJet events   #################################################                                                                                                      
@@ -314,7 +304,15 @@ int main(int argc, const char* argv[])
 
 	if (! MuPtCut || !MuId ) continue;
         //        	std::cout<<"coming inside imuloop 1"<<std::endl;
-                
+  
+	//###########       numMu   ###########################################################                                                                                                           
+	int numMu= getNumMu();
+        _MuPt->Fill(muPt->at(imu));
+
+	plotFill("_NumMU", numMu,10,0,10);
+
+
+	
 	float MuonCor=getCorrFactorMuon94X(isData,  muPt->at(imu), muEta->at(imu) , HistoMuId,HistoMuIso,HistoMuTrg,HistoMuTrack);
                 
 	Mu4Momentum.SetPtEtaPhiM(muPt->at(imu),muEta->at(imu),muPhi->at(imu),MuMass);
@@ -326,7 +324,7 @@ int main(int argc, const char* argv[])
 
 	for (int ijet= 0 ; ijet < nJet ; ijet++){
 	  // if (jetPFLooseId->at(ijet) > 0.5 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)                                          
-	  if (((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)
+	  if (((*jetID)[ijet]>>0&1 == 1) && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5)
 	    recoHT += jetPt->at(ijet);
 	  //std::cout<<"recoHT   = "<<recoHT<<std::endl;
 	}
@@ -342,7 +340,7 @@ int main(int argc, const char* argv[])
 	  Jet4Momentum.SetPtEtaPhiE(jetPt->at(ijet),jetEta->at(ijet),jetPhi->at(ijet),jetE->at(ijet));
 
 	  
-	  bool goodJet = (((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5);
+	  bool goodJet = (((*jetID)[ijet]>>0&1 == 1) && jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5);
 	  if (! goodJet) continue;
                     
 	  LQ4Momentum=Jet4Momentum + Mu4Momentum;
@@ -514,7 +512,7 @@ int main(int argc, const char* argv[])
   }
    
 fout->cd();
-  
+ _MuPt->Write(); 
   map<string, TH1F*>::const_iterator iMap1 = myMap1->begin();
   map<string, TH1F*>::const_iterator jMap1 = myMap1->end();
     

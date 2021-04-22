@@ -265,7 +265,7 @@ TH1F *  HistPUMC(bool isData,TFile *f_Double){
     //    TH1F * HistoPUMC= (TH1F *) PUMC->Get("pileup");
     //cout << "Coming in histpumc 1"<<"\n";
     TFile * PUMC= TFile::Open(f_Double->GetName());
-    std::cout<<"PUMC= inputfile name"<<f_Double->GetName()<<std::endl;
+    std::cout<<"PUMC = inputfile name: "<<f_Double->GetName()<<std::endl;
     TH1F * HistoPUMC= (TH1F *) PUMC->Get("puTrue");
     //std::cout << "PUMC histogram"<<HistoPUMC->Integral()<<std::endl;
     //cout << "Coming in histpumc 2 "<<"\n";
@@ -274,7 +274,10 @@ TH1F *  HistPUMC(bool isData,TFile *f_Double){
     //    std::cout << "HistoPUMC"<<HistoPUMC->Integral()<<std::endl;
     //cout << "Coming in histpumc 3 "<<"\n";
     return HistoPUMC;
-  }
+    
+
+
+}
   return 0;
 }
 
@@ -347,6 +350,15 @@ TH2F * FuncHistEleMVAId(std::string type){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float MuMass= 0.10565837;
 float eleMass= 0.000511;
+
+int getNumMu(){
+  int numMu=0;
+  for  (int imu=0 ; imu < nMu; imu++){
+    if (muPt->at(imu) < 20  || fabs(muEta->at(imu)) > 2.3 ) continue;
+    numMu++;
+  }
+  return numMu;
+}
 
 
 int getNumTau(){
@@ -426,7 +438,7 @@ int numBJets( float BJetPtCut, float CSVCut){
   int numBJet=0;
   for (int ijet= 0 ; ijet < nJet ; ijet++){
     // std::cout<<"comin inside numbjet for loop"<<std::endl;
-    if(((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && jetCSV2BJetTags->at(ijet) >  CSVCut)
+    if(((*jetID)[ijet]>>0&1 == 1) && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 && jetCSV2BJetTags->at(ijet) >  CSVCut)
       numBJet++;
     //    std::cout<<"comin inside numbjet for loop"<<std::endl;
 }
@@ -438,7 +450,7 @@ int numBJets( float BJetPtCut, float CSVCut){
 int numJets( float SimpleJetPtCut){
   int numJet=0;
   for (int ijet= 0 ; ijet < nJet ; ijet++){
-    if (((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
+    if (((*jetID)[ijet]>>0&1 == 1) && jetPt->at(ijet) > SimpleJetPtCut && fabs(jetEta->at(ijet)) < 2.4)
       numJet++;
   }
   return numJet;
@@ -686,7 +698,7 @@ float FuncFinalBTagSF(bool isData, TH2F ** Btagg_TT, float BJetPtCut, float CSVC
         
     float HadronFlavor= isData ? 1 : jetHadFlvr->at(ijet);
         
-    if (((*jetID)[ijet]>>0&1 == 1) > 0.5 && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 ){
+    if (((*jetID)[ijet]>>0&1 == 1) && jetPt->at(ijet) > BJetPtCut && fabs(jetEta->at(ijet)) < 2.4 ){
             
             
       if ( jetCSV2BJetTags->at(ijet) >  CSVCut ){
