@@ -307,8 +307,11 @@ int main(int argc, const char* argv[])
   
 	//###########       numMu   ###########################################################                                                                                                           
 	int numMu= getNumMu();
-        _MuPt->Fill(muPt->at(imu));
+        //TH1F* mupt = getMuPt();
 
+        _MuPt->Fill(muPt->at(imu));
+	float mupt = muPt->at(imu);
+	plotFill("_mupt", mupt,100,0,200);
 	plotFill("_NumMU", numMu,10,0,10);
 
 
