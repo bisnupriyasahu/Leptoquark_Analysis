@@ -8,7 +8,7 @@
 int main(int argc, const char* argv[])
 {
 
-  auto numOf_c_quark=0;
+  auto num65;6003;1cOf_c_quark=0;
   auto numOf_s_quark=0;  
   TH1F *_MuPt;
   _MuPt = new TH1F("_MuPt","",100,0,200);  
@@ -311,9 +311,9 @@ int main(int argc, const char* argv[])
 
         _MuPt->Fill(muPt->at(imu));
 	float mupt = muPt->at(imu);
-	plotFill("_mupt", muPt->at(imu),2000,0,2000);
+	plotFill("_mupt", mupt,100,0,200);
 	plotFill("_NumMU", numMu,10,0,10);
-	
+
 
 	
 	float MuonCor=getCorrFactorMuon94X(isData,  muPt->at(imu), muEta->at(imu) , HistoMuId,HistoMuIso,HistoMuTrg,HistoMuTrack);
@@ -345,9 +345,7 @@ int main(int argc, const char* argv[])
 	  
 	  bool goodJet = (((*jetID)[ijet]>>0&1 == 1) && jetPt->at(ijet) > JetPtCut && fabs(jetEta->at(ijet)) < 2.4 && Jet4Momentum.DeltaR(Mu4Momentum) > 0.5);
 	  if (! goodJet) continue;
-	  int numjet = getNumJet();
-	  plotFill("_JetPt",jetPt->at(ijet),2000,0,2000);         
-	  plotFill("_NumJet", numjet,10,0,10);
+                    
 	  LQ4Momentum=Jet4Momentum + Mu4Momentum;
 
 	  //###############################################################################################

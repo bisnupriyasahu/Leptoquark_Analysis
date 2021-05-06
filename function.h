@@ -351,6 +351,8 @@ TH2F * FuncHistEleMVAId(std::string type){
 float MuMass= 0.10565837;
 float eleMass= 0.000511;
 
+
+
 int getNumMu(){
   int numMu=0;
   for  (int imu=0 ; imu < nMu; imu++){
@@ -358,6 +360,17 @@ int getNumMu(){
     numMu++;
   }
   return numMu;
+}
+
+
+
+int getNumJet(){
+  int numJet=0;
+  for  (int ijet=0 ; ijet < nJet; ijet++){
+    if (jetPt->at(ijet) < 20  || fabs(jetEta->at(ijet)) > 2.3 ) continue;
+    numJet++;
+  }
+  return numJet;
 }
 
 
